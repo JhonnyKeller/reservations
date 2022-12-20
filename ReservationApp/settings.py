@@ -30,7 +30,7 @@ SECRET_KEY = str(config('DJANGO_SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = str(config('DEBUG')) == "0" # 1 == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['167.99.3.153','sitsmarter.com','www.sitsmarter.com']
 
 
 # Application definition
@@ -94,13 +94,24 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+            'default' : {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'reservationsDB',
+            'USER': 'may',
+            'PASSWORD': str(config('DBONDATAPASS')),
+            'HOST': 'localhost',
+            'PORT': '',
+        }
+    }
 
 
 # Password validation
