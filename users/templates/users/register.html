@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container">
+  <div class="content-section">
+      <form method="POST">
+          {% csrf_token %}
+          <fieldset class="form-group">
+              <legend class="border-bottom mb-4">Crie uma conta:</legend>
+              <p>A conta serve para pedir orçamentos e manter-se atualizado, a sua informação não será partilhada.</p>
+              {{ form|crispy }}
+          </fieldset>
+
+          Ao se registrar aceita as condições de privacidade.
+
+          <div class="form-group">
+            <br>
+              <button class="btn btn-outline-info" type="submit">Criar Conta</button>
+          </div>
+      </form>
+      <br>
+      <div class="border-top pt-3">
+          <small class="text-muted">
+              Já tem uma conta? <a class="ml-2" href="{% url 'users:login' %}">Iniciar Sessão</a>
+          </small>
+      </div>
+  </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,58 @@
+{% extends 'restaurants/base_menu.html' %}
+{% block content %}
+
+{% load crispy_forms_tags %}
+<div class="filter-bar">
+  <div class="container">
+    <div class="row justify-content-start">
+      <div class="col-12 col-md-4">
+        {% if form_pk != 'False' %}
+        <input type="button" value="Voltar" class="btn btn-primary mt-4" onclick="history.back()">
+          {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-8">
+      {% if create_form == 'True' %}
+      <form  method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-primary " type="submit" name="save_form" value="True">Criar</button>
+      </form>
+      {% else %}
+      {% if form_pk != 'False' %}
+        <form method="post">
+          {% csrf_token %}
+          {{ form_update|crispy }}
+          <input type="hidden" name="form_pk" value="{{form_pk}}">
+          <button class="btn btn-primary" type="submit" name="save_form_update" value="True">Guardar</button>
+        </form>
+      {% else %}
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <td>Numero de mesas conectadas:</td>
+            <td>Numero de lugares ganhos ou perdidos</td>
+            <td>Editar</td>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          {% for x in data %}
+              <tr>
+                <td>{{x.number_of_tables}}</td>
+                <td>{{x.number_of_chairs}}</td>
+                <td><form method="post">{% csrf_token %}<button class="btn btn-primary" type="submit" name="form_pk" value="{{x.pk}}">Editar</button></form></td>
+              </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

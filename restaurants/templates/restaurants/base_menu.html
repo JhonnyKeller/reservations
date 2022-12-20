@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+{% load static %}
+{% load crispy_forms_tags %}
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+
+    <title>SmartReservations</title>
+
+
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href='{% static "assets/vendor/aos/aos.css" %}' rel="stylesheet">
+    <link href='{% static "assets/vendor/bootstrap/css/bootstrap.min.css" %}' rel="stylesheet">
+    <link href='{% static "assets/vendor/bootstrap-icons/bootstrap-icons.css" %}' rel="stylesheet">
+    <link href='{% static "assets/vendor/boxicons/css/boxicons.min.css" %}' rel="stylesheet">
+    <link href='{% static "assets/vendor/glightbox/css/glightbox.min.css" %}' rel="stylesheet">
+    <link href='{% static "assets/vendor/swiper/swiper-bundle.min.css" %}' rel="stylesheet">
+
+
+    <!-- Main CSS Files -->
+    <link href='{% static "assets/menucss/stylemenu.css" %}' rel="stylesheet">
+
+  </head>
+  <body>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+      {% for x in restaurant %}
+      <div class="nav-side-menu">
+          <div class="brand">SmartReservations Menu <p>{{x.restaurant_name}}</p> </div>
+          <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
+
+              <div class="menu-list">
+
+                  <ul id="menu-content" class="menu-content collapse out">
+                      <li  data-toggle="collapse" data-target="#products" class="collapsed">
+                        <a href="#"><i class="fa fa-cutlery fa-lg"></i> Restaurantes <span class="arrow"></span></a>
+                      </li>
+                      <ul class="sub-menu collapse" id="products">
+                        {% for y in owner_restaurants %}
+                          <li><a href="{% url 'restaurantsview:restaurantmenu' restaurant_pk=y.pk %}">{{y.restaurant_name}}</a></li>
+                        {% endfor %}
+                      </ul>
+                      <li>
+                        <a href="{% url 'restaurantsview:restaurantmenu' restaurant_pk=x.pk %}">
+                        <i class="fa fa-users fa-lg"></i> Reservas
+                        </a>
+                      </li>
+                      <li  data-toggle="collapse" data-target="#openTime" class="collapsed">
+                        <a href="#"><i class="fa fa-dashboard fa-lg"></i>Horário <span class="arrow"></span></a>
+                      </li>
+                      <ul class="sub-menu collapse" id="openTime">
+                          <li class="active"><a href="{% url 'restaurantsview:restaurantOpenDays' restaurant_pk=x.pk %}">Gerir dias abertos</a></li>
+                          <li><a href="{% url 'restaurantsview:restaurantClosedDays' restaurant_pk=x.pk %}">Gerir dias Fechados</a></li>
+                          <li><a href="{% url 'restaurantsview:restaurantEstimatedTime' restaurant_pk=x.pk %}">Gerir tempo estimado</a></li>
+                          <li><a href="{% url 'restaurantsview:restaurantLimitOfCustomersPerHour' restaurant_pk=x.pk %}">Gerir limite de clientes por tempo</a></li>
+                      </ul>
+                      <li  data-toggle="collapse" data-target="#zones" class="collapsed">
+                        <a href="#"><i class="fa fa-file-text fa-lg"></i> Zonas <span class="arrow"></span></a>
+                      </li>
+                      <ul class="sub-menu collapse" id="zones">
+                          <li class="active"><a href="{% url 'restaurantsview:restaurantzones' restaurant_pk=x.pk %}">Gerir zonas</a></li>
+                          <li><a href="{% url 'restaurantsview:restauranttables' restaurant_pk=x.pk %}">Gerir Mesas</a></li>
+                          <li><a href="{% url 'restaurantsview:restaurantConnectTables' restaurant_pk=x.pk %}">Gerir conexão de mesas</a></li>
+                      </ul>
+                      <li>
+                        <a href="{% url 'restaurantsview:restaurantSettings' restaurant_pk=x.pk %}">
+                        <i class="fa fa-cog fa-lg"></i> Settings
+                        </a>
+                      </li>
+
+                  </ul>
+           </div>
+      </div>
+      {% endfor %}
+    <div id="nopadding" class="container-fluid">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+
+
+
+  <!-- Main JS Files -->
+  <script src='{% static "assets/menujss/menu.js" %}'></script>
+
+  <!-- Vendor JS Files -->
+  <script src='{% static "assets/vendor/purecounter/purecounter_vanilla.js" %}'></script>
+  <script src='{% static "assets/vendor/aos/aos.js" %}'></script>
+  <script src='{% static "assets/vendor/bootstrap/js/bootstrap.bundle.min.js" %}'></script>
+  <script src='{% static "assets/vendor/glightbox/js/glightbox.min.js" %}'></script>
+  <script src='{% static "assets/vendor/isotope-layout/isotope.pkgd.min.js" %}'></script>
+  <script src='{% static "assets/vendor/swiper/swiper-bundle.min.js" %}'></script>
+  <script src='{% static "assets/vendor/waypoints/noframework.waypoints.js" %}'></script>
+  <script src='{% static "assets/vendor/php-email-form/validate.js" %}'></script>
+</body>
+
+</html>

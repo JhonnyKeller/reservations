@@ -1,0 +1,83 @@
+{% extends 'restaurants/base_menu.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="filter-bar">
+  <div class="container">
+    <div class="row justify-content-start">
+      <div class="col-12 col-md-4">
+        {% if openDayPK != 'False' %}
+        <input type="button" value="Voltar" class="btn btn-primary mt-4" onclick="history.back()">
+        {% else %}
+        <form method="post">
+          {% csrf_token %}
+          {% if create_openDay == 'True' %}
+          <input type="button" value="Voltar" class="btn btn-primary mt-4" onclick="history.back()">
+          {% else %}
+          <button class="btn btn-primary mt-4" value="True"  type="submit" name="create_openDay">Criar Dia aberto</button>
+          {% endif %}
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-8">
+      {% if create_openDay == 'True' %}
+      <form  method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-primary " type="submit" name="save_openDay" value="True">Criar dia</button>
+      </form>
+      {% else %}
+      {% if openDayPK != 'False' %}
+        <form method="post">
+          {% csrf_token %}
+          {{ form_update|crispy }}
+          <input type="hidden" name="openDayPK" value="{{openDayPK}}">
+          <button class="btn btn-primary" type="submit" name="save_form_update" value="True">Guardar</button>
+        </form>
+      {% else %}
+      {% if delete != 'False' %}
+        <h3>Are you sure you want to delete?</h3>
+        <form  method="post">
+          {% csrf_token %}
+          <input type="hidden" name="delete" value="{{delete}}">
+          <button class="btn btn-primary" type="submit" name="delete_confirm" value="True">Yes</button>
+        </form>
+        <input type="button" value="No" class="btn btn-primary mt-4" onclick="history.back()">
+      {% else %}
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <td>Dia da semana</td>
+            <td>Turno</td>
+            <td>Começo</td>
+            <td>Fim</td>
+            <td>Editar</td>
+            <td>Apagar</td>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          {% for x in openDays %}
+              <tr>
+                <td>{{x.weekday}}</td>
+                <td>{{x.shift}}</td>
+                <td>{{x.start_time}}</td>
+                <td>{{x.end_time}}</td>
+                <td><form method="post">{% csrf_token %}<button class="btn btn-primary" type="submit" name="openDayPK" value="{{x.pk}}">Editar</button></form></td>
+                <td><form method="post">{% csrf_token %}<button class="btn btn-primary" type="submit" name="delete" value="{{x.pk}}">Apagar</button></form></td>
+              </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+      {% endif %}
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

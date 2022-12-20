@@ -1,0 +1,144 @@
+{% extends 'restaurants/base_menu.html' %}
+{% block content %}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script>
+    $(document).ready(function () {
+      var arrDisabledDates = {};
+      arrDisabledDates[new Date('08/08/2014')] = new Date('08/08/2014');
+      arrDisabledDates[new Date('08/30/2014')] = new Date('08/30/2014');
+      var dateToday = new Date();
+
+      $('#datepicker').datepicker({
+          minDate: dateToday,
+          beforeShowDay: function (date) {
+                              var day = date.getDay(),
+               bDisable = arrDisabledDates[date];
+              if (bDisable) return [false, '', '']
+              else return [(day != 2) && (day != 1)]
+          }
+      });
+  });
+</script>
+<div class="filter-bar">
+  <div class="container">
+
+    <div class="row justify-content-center">
+        <form  method="post">
+          {% csrf_token %}
+          <div class="container">
+            <div class="row">
+              <div class="col-2 mt-4">
+                <input  name="choosenday" value="{{choosenday}}" type="text" id="datepicker">
+              </div>
+              <div class="col-3 mt-4">
+                <select class="form-select" aria-label="Default select example">
+                <option name="filter_shift" value="all" selected>Todas as Opções</option>
+                <option name="filter_shift" value="Breakfast">Breakfast</option>
+                <option name="filter_shift" value="Lunch">Lunch</option>
+                <option name="filter_shift" value="Dinner">Dinner</option>
+                </select>
+              </div>
+              <div class="col-3 mt-4">
+                <select class="form-select" aria-label="Default select example">
+                <option name="filter_zone" value="all" selected>Todas as Opções</option>
+                {% for zone in zones %}
+                <option name="filter_zone"  value="{{zone.place_of_table}}">{{zone.place_of_table}}</option>
+                {% endfor %}
+                </select>
+              </div>
+              <div class="col-2 mt-3">
+                <button class="btn btn-primary mb-2" type="submit" name="date_true" value="True">Filtrar</button>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="row justify-content-center mt-5">
+          {% if reservation_breakfast %}
+          <h4 class="mt-3">Breakfast</h4>
+          {% for zone in zones %}
+          <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <td>{{zone.place_of_table}}</td>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider">
+              {% for x in reservation_breakfast %}
+                {% if zone.place_of_table|safe == x.table_place_preference|safe %}
+                  <tr>
+                    <td>{{x.full_name}}</td>
+                    <td>{{x.tablesused}}</td>
+                    <td>{{x.time}}</td>
+                    <td>{{x.number_of_people}}</td>
+                    <td>{{x.baby_chair}}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endfor %}
+          {% endif %}
+
+          {% if reservation_lunch %}
+          <h4 class="mt-3">Lunch</h4>
+          {% for zone in zones %}
+          <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <td>{{zone.place_of_table}}</td>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider">
+              {% for x in reservation_lunch %}
+                {% if zone.place_of_table|safe == x.table_place_preference|safe %}
+                  <tr>
+                    <td>{{x.full_name}}</td>
+                    <td>{{x.tablesused}}</td>
+                    <td>{{x.time}}</td>
+                    <td>{{x.number_of_people}}</td>
+                    <td>{{x.baby_chair}}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endfor %}
+          {% endif %}
+
+          {% if reservation_dinner %}
+          <h4 class="mt-3">Dinner</h4>
+          {% for zone in zones %}
+          <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <td>{{zone.place_of_table}}</td>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider">
+              {% for x in reservation_dinner %}
+                {% if zone.place_of_table|safe == x.table_place_preference|safe %}
+                  <tr>
+                    <td>{{x.full_name}}</td>
+                    <td>{{x.tablesused}}</td>
+                    <td>{{x.time}}</td>
+                    <td>{{x.number_of_people}}</td>
+                    <td>{{x.baby_chair}}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endfor %}
+          {% endif %}
+        </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
