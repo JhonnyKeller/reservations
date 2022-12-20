@@ -105,7 +105,7 @@ else:
     DATABASES = {
             'default' : {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'reservationsDB',
+            'NAME': 'reservationsdb',
             'USER': 'may',
             'PASSWORD': str(config('DBONDATAPASS')),
             'HOST': 'localhost',
