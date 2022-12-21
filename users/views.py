@@ -27,7 +27,7 @@ def activate(request, uidb64, token):
         user.save()
 
         messages.success(request, "Thank you for your email confirmation. Now you can login your account.")
-        return redirect('users_url:login')
+        return redirect('users:login')
     else:
         messages.error(request, "Activation link is invalid!")
 
@@ -142,7 +142,7 @@ def password_change(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Your password has been changed")
-            return redirect('users_url:ogin')
+            return redirect('users:login')
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
