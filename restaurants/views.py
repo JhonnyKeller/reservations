@@ -40,19 +40,19 @@ def createrestaurant(request):
 
 
 def restaurantmenu(request, restaurant_pk):
-    zones = placeOfTable.objects.filter(restaurant__pk__contains=restaurant_pk)
+    zones = placeOfTable.objects.filter(restaurant__pk__exact=restaurant_pk)
     today = date.today()
     date_true = 'False'
     choosenday = today.strftime("%Y-%m-%d")
     owner_restaurants = restaurants.objects.filter(owner__username__contains=request.user)
     restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
-    reservation_breakfast = reservations.objects.filter(restaurant__pk__contains=restaurant_pk,
+    reservation_breakfast = reservations.objects.filter(restaurant__pk__exact=restaurant_pk,
                                                         date__contains=choosenday,
                                                         shift__contains='Breakfast')
-    reservation_lunch = reservations.objects.filter(restaurant__pk__contains=restaurant_pk,
+    reservation_lunch = reservations.objects.filter(restaurant__pk__exact=restaurant_pk,
                                                     date__contains=choosenday,
                                                     shift__contains='Lunch')
-    reservation_dinner = reservations.objects.filter(restaurant__pk__contains=restaurant_pk,
+    reservation_dinner = reservations.objects.filter(restaurant__pk__exact=restaurant_pk,
                                                      date__contains=choosenday,
                                                      shift__contains='Dinner')
     choosenday = datetime.datetime.strptime(choosenday,"%Y-%m-%d")
@@ -87,9 +87,9 @@ def createZones(request, restaurant_pk):
     save_form = request.POST.get('save_form','False')
     form_pk = request.POST.get('form_pk','False')
     save_form_update = request.POST.get('save_form_update','False')
-    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__contains=restaurant_pk)
+    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
     owner_restaurants = restaurants.objects.filter(owner__username__contains=request.user)
-    data = placeOfTable.objects.filter(restaurant__pk__contains=restaurant_pk)
+    data = placeOfTable.objects.filter(restaurant__pk__exact=restaurant_pk)
     form = placeOfTableForm()
 
     if request.method == 'POST':
@@ -99,7 +99,7 @@ def createZones(request, restaurant_pk):
                 save = form.save(commit=False)
                 save.save()
         if form_pk != 'False':
-            form_to_update = placeOfTable.objects.get(pk=form_pk)
+            form_to_update = placeOfTable.objects.get(pk__exact=form_pk)
             form_update = placeOfTableForm(instance=form_to_update)
             if save_form_update == 'True':
                 form_update = placeOfTableForm(request.POST,instance=form_to_update)
@@ -120,7 +120,7 @@ def createZones(request, restaurant_pk):
                                                              'delete':delete})
 
 def createTables(request, restaurant_pk):
-    zones = placeOfTable.objects.filter(restaurant__pk__contains=restaurant_pk)
+    zones = placeOfTable.objects.filter(restaurant__owner__username__contains=request.user,restaurant__pk__exact=restaurant_pk)
     form_to_update = ''
     form_update = ''
     delete = request.POST.get('delete','False')
@@ -129,9 +129,10 @@ def createTables(request, restaurant_pk):
     save_form = request.POST.get('save_form','False')
     form_pk = request.POST.get('form_pk','False')
     save_form_update = request.POST.get('save_form_update','False')
-    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__contains=restaurant_pk)
+    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
     owner_restaurants = restaurants.objects.filter(owner__username__contains=request.user)
-    data = tables.objects.filter(restaurant__pk__contains=restaurant_pk)
+    data = tables.objects.filter(restaurant__pk__exact=restaurant_pk)
+    print(data)
     form = tablesForm()
 
     if request.method == 'POST':
@@ -170,9 +171,9 @@ def connectTables(request, restaurant_pk):
     save_form = request.POST.get('save_form','False')
     form_pk = request.POST.get('form_pk','False')
     save_form_update = request.POST.get('save_form_update','False')
-    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__contains=restaurant_pk)
+    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
     owner_restaurants = restaurants.objects.filter(owner__username__contains=request.user)
-    data = numberOfPeopleWhenTablesConnect.objects.filter(restaurant__pk__contains=restaurant_pk)
+    data = numberOfPeopleWhenTablesConnect.objects.filter(restaurant__pk__exact=restaurant_pk)
     form = numberOfPeopleWhenTablesConnectForm()
 
     if request.method == 'POST':
@@ -182,7 +183,7 @@ def connectTables(request, restaurant_pk):
                 save = form.save(commit=False)
                 save.save()
         if form_pk != 'False':
-            form_to_update = numberOfPeopleWhenTablesConnect.objects.get(pk=form_pk)
+            form_to_update = numberOfPeopleWhenTablesConnect.objects.get(pk__exact=form_pk)
             form_update = numberOfPeopleWhenTablesConnectForm(instance=form_to_update)
             if save_form_update == 'True':
                 form_update = numberOfPeopleWhenTablesConnectForm(request.POST,instance=form_to_update)
@@ -191,7 +192,7 @@ def connectTables(request, restaurant_pk):
                     form_pk = 'False'
         if delete != 'False':
             print(delete)
-            instance = numberOfPeopleWhenTablesConnect.objects.get(pk=delete)
+            instance = numberOfPeopleWhenTablesConnect.objects.get(pk__exact=delete)
             if delete_confirm == 'True':
                 instance.delete()
                 delete = 'False'
@@ -211,9 +212,9 @@ def openDays(request, restaurant_pk):
     save_openDay = request.POST.get('save_openDay','False')
     openDayPK = request.POST.get('openDayPK','False')
     save_form_update = request.POST.get('save_form_update','False')
-    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__contains=restaurant_pk)
+    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
     owner_restaurants = restaurants.objects.filter(owner__username__contains=request.user)
-    openDays = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__pk__contains=restaurant_pk)
+    openDays = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__pk__exact=restaurant_pk)
     form = restaurantsOpenDaysForm()
 
     if request.method == 'POST':
@@ -223,7 +224,7 @@ def openDays(request, restaurant_pk):
                 save = form.save(commit=False)
                 save.save()
         if openDayPK != 'False':
-            openDayToUpdate = restaurantOpenDaysOfTheWeek.objects.get(pk=openDayPK)
+            openDayToUpdate = restaurantOpenDaysOfTheWeek.objects.get(pk__exact=openDayPK)
             print(openDayToUpdate)
             form_update = restaurantsOpenDaysForm(instance=openDayToUpdate)
             if save_form_update == 'True':
@@ -232,7 +233,7 @@ def openDays(request, restaurant_pk):
                     form_update.save()
                     openDayPK = 'False'
         if delete != 'False':
-            instance = restaurantOpenDaysOfTheWeek.objects.get(pk=delete)
+            instance = restaurantOpenDaysOfTheWeek.objects.get(pk__exact=delete)
             if delete_confirm == 'True':
                 instance.delete()
                 delete = 'False'
@@ -253,9 +254,9 @@ def closedDays(request, restaurant_pk):
     save_form = request.POST.get('save_form','False')
     form_pk = request.POST.get('form_pk','False')
     save_form_update = request.POST.get('save_form_update','False')
-    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__contains=restaurant_pk)
+    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
     owner_restaurants = restaurants.objects.filter(owner__username__contains=request.user)
-    data = closedExceptions.objects.filter(restaurant__pk__contains=restaurant_pk)
+    data = closedExceptions.objects.filter(restaurant__pk__exact=restaurant_pk)
     form = restaurantsClosedDaysForm()
 
     if request.method == 'POST':
@@ -294,9 +295,9 @@ def estimatedTime(request, restaurant_pk):
     save_form = request.POST.get('save_form','False')
     form_pk = request.POST.get('form_pk','False')
     save_form_update = request.POST.get('save_form_update','False')
-    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__contains=restaurant_pk)
+    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
     owner_restaurants = restaurants.objects.filter(owner__username__contains=request.user)
-    data = estimatedTimeCustomersSpend.objects.filter(restaurant__pk__contains=restaurant_pk)
+    data = estimatedTimeCustomersSpend.objects.filter(restaurant__pk__exact=restaurant_pk)
     form = restaurantsEstimatedTimeForm()
 
     if request.method == 'POST':
@@ -335,9 +336,9 @@ def limitOfCustomersPerHours(request, restaurant_pk):
     save_form = request.POST.get('save_form','False')
     form_pk = request.POST.get('form_pk','False')
     save_form_update = request.POST.get('save_form_update','False')
-    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__contains=restaurant_pk)
+    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
     owner_restaurants = restaurants.objects.filter(owner__username__contains=request.user)
-    data = limitOfCustomersPerHour.objects.filter(restaurant__pk__contains=restaurant_pk)
+    data = limitOfCustomersPerHour.objects.filter(restaurant__pk__exact=restaurant_pk)
     form = limitOfCustomersPerHourForm()
 
     if request.method == 'POST':
@@ -369,7 +370,7 @@ def limitOfCustomersPerHours(request, restaurant_pk):
 
 def restaurantSettings(request,restaurant_pk):
     form_pk = 'False'
-    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__contains=restaurant_pk)
+    restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
     form_to_update = restaurants.objects.get(pk=restaurant_pk)
     form_to_update_time_divider = timeDivider.objects.get(restaurant__pk=restaurant_pk)
     form_update_time_divider = timeDividerForm(instance=form_to_update_time_divider)

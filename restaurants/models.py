@@ -7,7 +7,7 @@ User = get_user_model()
 class restaurants(models.Model):
     owner = models.ForeignKey(User,related_name='restaurant_owner',on_delete=models.CASCADE)
     restaurant_name = models.CharField(max_length=254,unique=True)
-    adress = models.CharField(max_length=254,unique=True)
+    adress = models.CharField(max_length=254,unique=False)
     number_of_chairs = models.PositiveIntegerField()
     number_of_babychairs = models.PositiveIntegerField()
     restaurant_img = models.FileField(upload_to='restaurant_img')
@@ -17,7 +17,7 @@ class restaurants(models.Model):
 
 class placeOfTable(models.Model):
     restaurant = models.ForeignKey(restaurants,related_name='restaurantplaceoftable',on_delete=models.CASCADE)
-    place_of_table = models.CharField(max_length=254,unique=True)
+    place_of_table = models.CharField(max_length=254,unique=False)
 
     def __str__(self):
         return self.place_of_table
@@ -25,7 +25,7 @@ class placeOfTable(models.Model):
 
 class tables(models.Model):
     restaurant = models.ForeignKey(restaurants,related_name='restauranttable',on_delete=models.CASCADE)
-    table_number = models.CharField(max_length=254,unique=True)
+    table_number = models.CharField(max_length=254,unique=False)
     number_of_seats = models.CharField(max_length=254,unique=False)
     place_of_table = models.ForeignKey(placeOfTable,related_name='places',on_delete=models.CASCADE)
     can_connect_tables = models.CharField(max_length=254,unique=False)
