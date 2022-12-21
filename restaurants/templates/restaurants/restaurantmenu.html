@@ -26,14 +26,19 @@
   <div class="container">
 
     <div class="row justify-content-center">
+      <div class="col-0 col-lg-4">
+        <input type="hidden" name="" value="d">
+      </div>
+      <div class="col-md-12 col-lg-8">
         <form  method="post">
           {% csrf_token %}
-          <div class="container">
+          <div class="container medium-margin">
             <div class="row">
-              <div class="col-2 mt-4">
+
+              <div class="col-4 col-md-2">
                 <input  name="choosenday" value="{{choosenday}}" type="text" id="datepicker">
               </div>
-              <div class="col-3 mt-4">
+              <div class="col-3 col-md-3">
                 <select class="form-select" aria-label="Default select example">
                 <option name="filter_shift" value="all" selected>Todas as Opções</option>
                 <option name="filter_shift" value="Breakfast">Breakfast</option>
@@ -41,7 +46,7 @@
                 <option name="filter_shift" value="Dinner">Dinner</option>
                 </select>
               </div>
-              <div class="col-3 mt-4">
+              <div class="col-3 col-md-3">
                 <select class="form-select" aria-label="Default select example">
                 <option name="filter_zone" value="all" selected>Todas as Opções</option>
                 {% for zone in zones %}
@@ -49,7 +54,7 @@
                 {% endfor %}
                 </select>
               </div>
-              <div class="col-2 mt-3">
+              <div class="col-2 col-md-2">
                 <button class="btn btn-primary mb-2" type="submit" name="date_true" value="True">Filtrar</button>
               </div>
             </div>
@@ -135,6 +140,7 @@
           {% endif %}
         </div>
 
+    </div>
     </div>
 
   </div>

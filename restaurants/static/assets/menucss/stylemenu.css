@@ -108,13 +108,19 @@
   -ms-transition: all 1s ease;
   transition: all 1s ease;
 }
-@media (max-width: 767px) {
+
+.medium-margin {
+  margin-top: 14px;
+}
+
+@media (max-width: 1200px) {
   .nav-side-menu {
     position: relative;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
 	height:inherit;
   }
+
   .nav-side-menu .toggle-btn {
     display: block;
     cursor: pointer;
@@ -135,10 +141,11 @@
     line-height: 35px !important;
   }
 }
-@media (min-width: 767px) {
+@media (min-width: 1200px) {
   .nav-side-menu .menu-list .menu-content {
     display: block;
   }
+
 }
 body {
   margin: 0px;
