@@ -32,7 +32,7 @@
               <option name="filter_shift" value="Dinner">Dinner</option>
               </select>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-3 mt-2">
               <select class="form-select" aria-label="Default select example">
               <option name="filter_zone" value="all" selected>Todas as Opções</option>
               {% for zone in zones %}
@@ -40,10 +40,10 @@
               {% endfor %}
               </select>
             </div>
-            <div class="col-6 col-md-6 mt-2 col-lg-3 margin-top text-center">
+            <div class="col-12 col-md-6 mt-2 col-lg-3 margin-top text-center">
               <input class="text-center margin-top"  name="choosenday" value="{{choosenday}}" type="text" id="datepicker">
             </div>
-            <div class="col-6 col-md-6 col-lg-3 text-center">
+            <div class="col-12 col-md-6 col-lg-3 text-end">
               <button class="btn btn-lg btn-dark  margin-top" type="submit" name="date_true" value="True">Filtrar</button>
             </div>
           </div>
