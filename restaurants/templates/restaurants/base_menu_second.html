@@ -23,6 +23,10 @@
     <link href='{% static "assets/menucss/stylemenu_two.css" %}' rel="stylesheet">
   </head>
   <body>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <div class="btn btnl">
          <span class="fas fa-bars"></span>
       </div>
@@ -30,31 +34,43 @@
          <div class="text">
             SitSmarter
          </div>
+         {% for x in restaurant %}
          <ul class="main_side">
-            <li class="active"><a href="#">Dashboard</a></li>
             <li>
-               <a href="#" id="1">Pages
+               <a href="#" id="1">Restaurantes
                <span class="fas fa-caret-down"></span>
                </a>
                <ul class="item-show-1">
-                  <li><a href="#">Contact us</a></li>
-                  <li><a href="#">Our Team</a></li>
+                 {% for y in owner_restaurants %}
+                   <li><a href="{% url 'restaurantsview:restaurantmenu' restaurant_pk=y.pk %}">{{y.restaurant_name}}</a></li>
+                 {% endfor %}
                </ul>
             </li>
+            <li><a href="{% url 'restaurantsview:restaurantmenu' restaurant_pk=x.pk %}">Reservas</a></li>
             <li>
-               <a href="#" id="2">Services
+               <a href="#" id="2">Horário
                <span class="fas fa-caret-down"></span>
                </a>
                <ul class="item-show-2">
-                  <li><a href="#">App Design</a></li>
-                  <li><a href="#">Web Design</a></li>
+                  <li><a href="{% url 'restaurantsview:restaurantOpenDays' restaurant_pk=x.pk %}">Gerir dias abertos</a></li>
+                  <li><a href="{% url 'restaurantsview:restaurantClosedDays' restaurant_pk=x.pk %}">Gerir dias fechados</a></li>
+                  <li><a href="{% url 'restaurantsview:restaurantEstimatedTime' restaurant_pk=x.pk %}">Gerir tempo estimado</a></li>
+                  <li><a href="{% url 'restaurantsview:restaurantLimitOfCustomersPerHour' restaurant_pk=x.pk %}">Gerir limite de clientes por tempo</a></li>
                </ul>
             </li>
-            <li><a href="#">Users</a></li>
-            <li><a href="#">Message</a></li>
-            <li><a href="#">Bookmark</a></li>
-            <li><a href="#">Files</a></li>
+            <li>
+               <a href="#" id="3">Zonas
+               <span class="fas fa-caret-down"></span>
+               </a>
+               <ul class="item-show-3">
+                  <li><a href="{% url 'restaurantsview:restaurantzones' restaurant_pk=x.pk %}">Gerir zonas</a></li>
+                  <li><a href="{% url 'restaurantsview:restauranttables' restaurant_pk=x.pk %}">Gerir Mesas</a></li>
+                  <li><a href="{% url 'restaurantsview:restaurantConnectTables' restaurant_pk=x.pk %}">Gerir conexão de mesas</a></li>
+               </ul>
+            </li>
+            <li><a href="{% url 'restaurantsview:restaurantSettings' restaurant_pk=x.pk %}">Settings</a></li>
          </ul>
+         {% endfor %}
       </nav>
       <div class="content">
         <div class="container justify-content-center">

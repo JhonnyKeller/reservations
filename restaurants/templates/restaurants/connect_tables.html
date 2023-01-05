@@ -1,18 +1,18 @@
-{% extends 'restaurants/base_menu.html' %}
+{% extends 'restaurants/base_menu_second.html' %}
 {% block content %}
 
 {% load crispy_forms_tags %}
-<div class="filter-bar">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-4">
-        {% if form_pk != 'False' %}
-        <input type="button" value="Voltar" class="btn btn-primary mt-4" onclick="history.back()">
-          {% endif %}
-      </div>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-4">
+      {% if form_pk != 'False' %}
+      <input type="button" value="Voltar" class="btn btn-primary mt-4" onclick="history.back()">
+        {% endif %}
     </div>
   </div>
 </div>
+
 <div class="container">
   <div class="row">
     <div class="col-12 col-md-8">
