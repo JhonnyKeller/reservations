@@ -38,6 +38,7 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
         for y in tables_zone:
             print('------------------Current table---------------------')
             print(y)
+            print(the_hours)
             ii = -1
             for hours_saved in range(0,len(the_hours),1):
                 ii += 1
@@ -78,6 +79,8 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                             if ccll == utl:
                                 can_connect_list.remove(used_table_list[utl])
                     for ccl_two in range(0,len(can_connect_list),1):
+                        if ii == -1:
+                            break
                         for i in range(0, len(tables_used), 3):
                             if int(tables_used[i])  == int(can_connect_list[ccl_two]):
                                 temporary_table_two.append(tables_used[i])
@@ -108,6 +111,8 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                     if ccll == used_table_list_one[utl]:
                                         can_connect_list_two.remove(used_table_list_one[utl])
                             for ccl_three in range(0,len(can_connect_list_two),1):
+                                if ii == -1:
+                                    break
                                 for i in range(0, len(tables_used), 3):
                                     if int(tables_used[i]) == int(can_connect_list_two[ccl_three]):
                                         temporary_table_three.append(tables_used[i])
@@ -138,6 +143,8 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                             if ccll == used_table_list_two[utl]:
                                                 can_connect_list_three.remove(used_table_list_two[utl])
                                     for ccl_four in range(0,len(can_connect_list_three),1):
+                                        if ii == -1:
+                                            break
                                         for i in range(0, len(tables_used), 3):
                                             if int(tables_used[i]) == int(can_connect_list_three[ccl_four]):
                                                 temporary_table_four.append(tables_used[i])
@@ -165,9 +172,11 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                             can_connect_list_four = can_connect_list_four.split(',')
                                             for utl in range(0, len(used_table_list_three), 1):
                                                 for ccll in can_connect_list_four:
-                                                    if ccll == utl:
+                                                    if ccll == used_table_list_three[utl]:
                                                         can_connect_list_four.remove(used_table_list_three[utl])
                                             for ccl_five in range(0,len(can_connect_list_four),1):
+                                                if ii == -1:
+                                                    break
                                                 for i in range(0, len(tables_used), 3):
                                                     if int(tables_used[i]) == int(can_connect_list_four[ccl_five]):
                                                         temporary_table_five.append(tables_used[i])
@@ -183,10 +192,11 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                                 if verify_hour or temporary_table_five == []:
                                                     check_table = tables.objects.filter(table_number__contains=can_connect_list_four[ccl_five])
                                                     save_necessary_people_five = save_necessary_people_four
-                                                    save_necessary_people_five -= int(check_table[0].number_of_seats) + connect_logic[2].number_of_chairs
+                                                    save_necessary_people_five -= int(check_table[0].number_of_seats) + connect_logic[1].number_of_chairs
                                                     used_table_list_four = used_table_list_three
                                                     used_table_list_four.append(can_connect_list_four[ccl_five])
                                                     if save_necessary_people_five <= 0:
+                                                        print(ii)
                                                         availabletimes.append(the_hours[ii])
                                                         the_hours.remove(the_hours[ii])
                                                         ii -= 1
@@ -195,9 +205,11 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                                     can_connect_list_five = can_connect_list_five.split(',')
                                                     for utl in range(0, len(used_table_list_four), 1):
                                                         for ccll in can_connect_list_five:
-                                                            if ccll == utl:
+                                                            if ccll == used_table_list_four[utl]:
                                                                 can_connect_list_five.remove(used_table_list_four[utl])
                                                     for ccl_six in range(0,len(can_connect_list_five),1):
+                                                        if ii == -1:
+                                                            break
                                                         for i in range(0, len(tables_used), 3):
                                                             if int(tables_used[i]) == int(can_connect_list_five[ccl_six]):
                                                                 temporary_table_six.append(tables_used[i])
@@ -217,6 +229,8 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                                             used_table_list_five = used_table_list_four
                                                             used_table_list_five.append(can_connect_list_five[ccl_six])
                                                             if save_necessary_people_six <= 0:
+                                                                print(ii)
+                                                                print(the_hours)
                                                                 availabletimes.append(the_hours[ii])
                                                                 the_hours.remove(the_hours[ii])
                                                                 ii -= 1
@@ -225,7 +239,7 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                                             can_connect_list_six = can_connect_list_six.split(',')
                                                             for utl in range(0, len(used_table_list_five), 1):
                                                                 for ccll in can_connect_list_six:
-                                                                    if ccll == utl:
+                                                                    if ccll == used_table_list_five[utl]:
                                                                         can_connect_list_six.remove(used_table_list_five[utl])
 
 
