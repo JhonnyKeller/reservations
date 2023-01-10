@@ -280,7 +280,7 @@ def return_weekdays_not_open():
     weekdaysnotopen.append(checkIfThereIsWeekDay('Thursday', 4))
     weekdaysnotopen.append(checkIfThereIsWeekDay('Friday', 5))
     weekdaysnotopen.append(checkIfThereIsWeekDay('Saturday', 6))
-    weekdaysnotopen.append(checkIfThereIsWeekDay('Sunday', 7))
+    weekdaysnotopen.append(checkIfThereIsWeekDay('Sunday', 0))
     new_string = ''
     for e in weekdaysnotopen:
         if e != None:
@@ -298,7 +298,7 @@ def numbers_to_weekday(argument):
         4: "Thursday",
         5: "Friday",
         6: "Saturday",
-        0: "Sunday",
+        7: "Sunday",
     }
     return switcher.get(argument, '')
 
