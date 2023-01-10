@@ -25,110 +25,126 @@
         <div class="container">
           <div class="row">
             <div class="col-md-6 col-lg-3">
-              <select class="form-select" aria-label="Default select example">
+              <select class="form-select mt-2" aria-label="Default select example">
               <option name="filter_shift" value="all" selected>Todas as Opções</option>
               <option name="filter_shift" value="Breakfast">Breakfast</option>
               <option name="filter_shift" value="Lunch">Lunch</option>
               <option name="filter_shift" value="Dinner">Dinner</option>
               </select>
             </div>
-            <div class="col-md-6 col-lg-3 mt-2">
-              <select class="form-select" aria-label="Default select example">
+            <div class="col-md-6 col-lg-3">
+              <select class="form-select mt-2" aria-label="Default select example">
               <option name="filter_zone" value="all" selected>Todas as Opções</option>
               {% for zone in zones %}
               <option name="filter_zone"  value="{{zone.place_of_table}}">{{zone.place_of_table}}</option>
               {% endfor %}
               </select>
             </div>
-            <div class="col-12 col-md-6 mt-2 col-lg-3 margin-top text-center">
-              <input class="text-center margin-top"  name="choosenday" value="{{choosenday}}" type="text" id="datepicker">
+            <div class="col-12 col-md-6 mt-2 col-lg-3  margin-top text-center">
+              <input class="text-center margin-top form-control"  name="choosenday" value="{{choosenday}}" type="text" id="datepicker">
             </div>
             <div class="col-12 col-md-6 col-lg-3 text-end">
-              <button class="btn btn-lg btn-dark  margin-top" type="submit" name="date_true" value="True">Filtrar</button>
+              <button class="btn btn-lg btn-dark mt-2  margin-top" type="submit" name="date_true" value="True">Filtrar</button>
             </div>
           </div>
         </div>
+
       </form>
       <hr class="hr" />
-      <div class="row justify-content-center mt-5">
-        {% if reservation_breakfast %}
-        <h4 class="mt-3">Breakfast</h4>
-        {% for zone in zones %}
-        <table class="table">
-          <thead class="thead-dark">
-            <tr>
-              <td>{{zone.place_of_table}}</td>
-            </tr>
-          </thead>
-          <tbody class="table-group-divider">
-            {% for x in reservation_breakfast %}
-              {% if zone.place_of_table|safe == x.table_place_preference|safe %}
-                <tr>
-                  <td>{{x.full_name}}</td>
-                  <td>{{x.tablesused}}</td>
-                  <td>{{x.time}}</td>
-                  <td>{{x.number_of_people}}</td>
-                  <td>{{x.baby_chair}}</td>
-                </tr>
-              {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
-        {% endfor %}
-        {% endif %}
+      <div class="container">
+        <div class="row justify-content-center mt-5">
+          {% if reservation_breakfast %}
+          <h4 class="mt-3">Breakfast</h4>
+          {% for zone in zones %}
+          <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <td>{{zone.place_of_table}}</td>
+                <td>Mesas</td>
+                <td>Horas</td>
+                <td>N de pessoas</td>
+                <td>Cadeira bebe</td>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider">
+              {% for x in reservation_breakfast %}
+                {% if zone.place_of_table|safe == x.table_place_preference|safe %}
+                  <tr>
+                    <td>{{x.full_name}}</td>
+                    <td>{{x.tablesused}}</td>
+                    <td>{{x.time}}</td>
+                    <td>{{x.number_of_people}}</td>
+                    <td>{{x.baby_chair}}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endfor %}
+          {% endif %}
 
-        {% if reservation_lunch %}
-        <h4 class="mt-3">Lunch</h4>
-        {% for zone in zones %}
-        <table class="table">
-          <thead class="thead-dark">
-            <tr>
-              <td>{{zone.place_of_table}}</td>
-            </tr>
-          </thead>
-          <tbody class="table-group-divider">
-            {% for x in reservation_lunch %}
-              {% if zone.place_of_table|safe == x.table_place_preference|safe %}
-                <tr>
-                  <td>{{x.full_name}}</td>
-                  <td>{{x.tablesused}}</td>
-                  <td>{{x.time}}</td>
-                  <td>{{x.number_of_people}}</td>
-                  <td>{{x.baby_chair}}</td>
-                </tr>
-              {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
-        {% endfor %}
-        {% endif %}
+          {% if reservation_lunch %}
+          <h4 class="mt-3">Lunch</h4>
+          {% for zone in zones %}
+          <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <td>{{zone.place_of_table}}</td>
+                <td>Mesas</td>
+                <td>Horas</td>
+                <td>N de pessoas</td>
+                <td>Cadeira bebe</td>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider">
+              {% for x in reservation_lunch %}
+                {% if zone.place_of_table|safe == x.table_place_preference|safe %}
+                  <tr>
+                    <td>{{x.full_name}}</td>
+                    <td>{{x.tablesused}}</td>
+                    <td>{{x.time}}</td>
+                    <td>{{x.number_of_people}}</td>
+                    <td>{{x.baby_chair}}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endfor %}
+          {% endif %}
 
-        {% if reservation_dinner %}
-        <h4 class="mt-3">Dinner</h4>
-        {% for zone in zones %}
-        <table class="table">
-          <thead class="thead-dark">
-            <tr>
-              <td>{{zone.place_of_table}}</td>
-            </tr>
-          </thead>
-          <tbody class="table-group-divider">
-            {% for x in reservation_dinner %}
-              {% if zone.place_of_table|safe == x.table_place_preference|safe %}
-                <tr>
-                  <td>{{x.full_name}}</td>
-                  <td>{{x.tablesused}}</td>
-                  <td>{{x.time}}</td>
-                  <td>{{x.number_of_people}}</td>
-                  <td>{{x.baby_chair}}</td>
-                </tr>
-              {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
-        {% endfor %}
-        {% endif %}
+          {% if reservation_dinner %}
+          <h4 class="mt-3">Dinner</h4>
+          {% for zone in zones %}
+          <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <td>{{zone.place_of_table}}</td>
+                <td>Mesas</td>
+                <td>Horas</td>
+                <td>N de pessoas</td>
+                <td>Cadeira bebe</td>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider">
+              {% for x in reservation_dinner %}
+                {% if zone.place_of_table|safe == x.table_place_preference|safe %}
+                  <tr>
+                    <td>{{x.full_name}}</td>
+                    <td>{{x.tablesused}}</td>
+                    <td>{{x.time}}</td>
+                    <td>{{x.number_of_people}}</td>
+                    <td>{{x.baby_chair}}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endfor %}
+          {% endif %}
+        </div>
       </div>
+
 
   </div>
   </div>

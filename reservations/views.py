@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from datetime import datetime, timedelta
 from .assign_tables_function import assignThTables
 
+
 def verify_hour_availability(time_to_check,start_time,end_time,estimated_time):
     time_to_check = datetime.strptime(time_to_check, '%H:%M:%S')
     start_time += ':00'
@@ -267,7 +268,7 @@ def retrieveTablesUsed(date, shift, restaurantname):
 
 def checkIfThereIsWeekDay(weekday, value):
     weekday = restaurantOpenDaysOfTheWeek.objects.filter(weekday__contains=weekday)
-    if weekday != []:
+    if weekday.count() <= 0:
         return value
     return None
 
@@ -280,11 +281,13 @@ def return_weekdays_not_open():
     weekdaysnotopen.append(checkIfThereIsWeekDay('Friday', 5))
     weekdaysnotopen.append(checkIfThereIsWeekDay('Saturday', 6))
     weekdaysnotopen.append(checkIfThereIsWeekDay('Sunday', 7))
-    new_list = []
+    new_string = ''
     for e in weekdaysnotopen:
         if e != None:
-            new_list.append(e)
-    return new_list
+            new_string += str(e) + ','
+        else:
+            new_string += '10,'
+    return new_string[:len(new_string)-1]
 
 
 def numbers_to_weekday(argument):
@@ -309,8 +312,52 @@ def return_estimated_time(number_of_people):
     estimative = estimative.strftime("%H:%M")
     return estimative
 
+def returnStringOfClosedExceptions(restaurant):
+    closed_days = closedExceptions.objects.filter(restaurant__restaurant_name__contains=restaurant)
+    string = ''
+    # choosenday = datetime.strptime(choosenday, '%m/%d/%Y')
+    # choosenday = choosenday.strftime("%Y-%m-%d")
+    for x in closed_days:
+        if int(x.number_of_acceptance) <= 0:
+            start_day = x.closed_days_start
+            end_day = x.closed_days_end
+            lowest_start_time = ''
+            higher_end_time = ''
+            while start_day <= end_day:
+                filter_weekday = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,weekday__contains=numbers_to_weekday(start_day.isoweekday()))
+                print('filter_weekday')
+                print(filter_weekday)
+                for y in filter_weekday:
+                    if lowest_start_time == '':
+                        lowest_start_time = y.start_time
+                        print('lowest_start_time')
+                        print(lowest_start_time)
+                    elif lowest_start_time > y.start_time:
+                        lowest_start_time = y.start_time
+                    if higher_end_time == '':
+                        higher_end_time = y.end_time
+                    elif higher_end_time < y.end_time:
+                        higher_end_time = y.end_time
+                if lowest_start_time != '':
+                    print('times')
+                    print(lowest_start_time)
+                    print(x.time_start)
+                    if lowest_start_time >= x.time_start and higher_end_time <= x.time_end:
+                        the_day = start_day.strftime('%d-%m-%Y') + ','
+                        if the_day[3:4] == '0':
+                            the_day = the_day[:3] + the_day[4:]
+                        print('the_day[3:4]')
+                        print(the_day[3:4])
+                        string += the_day
+                start_day += timedelta(days=1)
+    return string[:len(string)-1]
+
+
 # Create your views here.
 def reservationss(request, username, restaurantname):
+    closed_days = returnStringOfClosedExceptions(restaurantname)
+    print('closed_days')
+    print(closed_days)
     stage = request.POST.get('stage', '1')
     number_of_people = request.POST.get('number_of_people', 'False')
     shift = request.POST.get('shift', 'False')
@@ -329,9 +376,13 @@ def reservationss(request, username, restaurantname):
     choosen_day =  today.strftime("%m/%d/%Y")
     form = reservationsForm()
     weekdaysnotopen = return_weekdays_not_open()
+    print('weekdaysnotopen')
+    print(weekdaysnotopen)
     closed_exceptions = closedExceptions.objects.filter(restaurant__restaurant_name__contains=restaurantname)
     restaurant = restaurants.objects.filter(owner__username__contains=username,
                                             restaurant_name__contains=restaurantname)
+
+
     if request.method == 'POST':
         if stage == '2':
 
@@ -342,11 +393,7 @@ def reservationss(request, username, restaurantname):
             reservation = reservations.objects.filter(date__contains=choosenday)
             weekfilter = restaurantOpenDaysOfTheWeek.objects.filter(weekday__contains=weekday,
                                                                     restaurant__restaurant_name__contains=restaurantname)
-            print(choosenday)
-            print(shift)
             tu = retrieveTablesUsed(choosenday, shift, restaurantname)
-            print('tu')
-            print(tu)
             time_divider = timeDivider.objects.filter(restaurant__restaurant_name__contains=restaurantname)
             time_divider = time_divider[0].each_time
             time_divider_list = time_divider.split(":")
@@ -453,7 +500,7 @@ def reservationss(request, username, restaurantname):
 
     return render(request,'reservations/reservation.html',{'restaurantname':restaurantname,
                                                         'stage':stage,
-                                                        'weeksdaysnotopen':weekdaysnotopen,
+                                                        'weekdaysnotopen':weekdaysnotopen,
                                                         'choosenday':choosenday,
                                                         'message':message,
                                                         'choosen_day':choosen_day,
@@ -463,4 +510,5 @@ def reservationss(request, username, restaurantname):
                                                         'time':time,
                                                         'number_of_people':number_of_people,
                                                         'shift':shift,'baby_chair':baby_chair,
-                                                        'form_saved':form_saved})
+                                                        'form_saved':form_saved,
+                                                        'closed_days':closed_days})

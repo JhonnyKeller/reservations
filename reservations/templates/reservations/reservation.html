@@ -40,14 +40,28 @@
         arrDisabledDates[new Date('08/08/2014')] = new Date('08/08/2014');
         arrDisabledDates[new Date('08/30/2014')] = new Date('08/30/2014');
         var dateToday = new Date();
+        var x = document.getElementById("myText").value;
+        console.log(x)
+        var array = JSON.parse("[" + x + "]");
+        var disabledDays = document.getElementById("myDatas").value;
+        disabledDays = disabledDays.split(',');
+
+    //     [
+    //    "27-1-2023", "25-1-2023", "26-1-2023",
+    //    "4-1-2023", "5-1-2023", "6-1-2023", "7-1-2023", "8-1-2023", "9-1-2023"
+    // ];
+    console.log(disabledDays)
 
         $('#datepicker').datepicker({
             minDate: dateToday,
             beforeShowDay: function (date) {
                                 var day = date.getDay(),
                  bDisable = arrDisabledDates[date];
+                var string = jQuery.datepicker.formatDate('d-m-yy', date);
+                var isDisabled = ($.inArray(string, disabledDays) != -1);
+                console.log(isDisabled)
                 if (bDisable) return [false, '', '']
-                else return [(day != 2) && (day != 1)]
+                else return [(day != array[0]) && (day != array[1]) && (day != array[2]) && (day != array[3]) && (day != array[4]) && (day != array[5]) && (day != array[6]) && !isDisabled]
             }
         });
     });
@@ -69,7 +83,9 @@
                 {{ form.shift|as_crispy_field }}
                 {{ form.number_of_people|as_crispy_field }}
                 {{ form.baby_chair|as_crispy_field }}
-                <p class="mt-3">Date: <input name="choosenday" value='{{choosen_day}}' type="text" id="datepicker"></p>
+                <input id="myText" type="hidden" value="{{weekdaysnotopen}}">
+                <input id="myDatas" type="hidden" value="{{closed_days}}">
+                <p class="mt-3">Date: <input name="choosenday" class="form-control" value='{{choosen_day}}' type="text" id="datepicker"></p>
                 <button type="submit" class="choosendate btn btn-primary mt-3" name="stage" value="2">Próxima</button>
               </form>
             </div>

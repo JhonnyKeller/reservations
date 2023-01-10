@@ -5,11 +5,19 @@ from .models import (restaurants,placeOfTable,tables,restaurantOpenDaysOfTheWeek
 from .forms import (restaurantsForm,restaurantsOpenDaysForm,restaurantsClosedDaysForm,
                     restaurantsEstimatedTimeForm,placeOfTableForm,tablesForm,
                     numberOfPeopleWhenTablesConnectForm,limitOfCustomersPerHourForm,timeDividerForm)
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from reservations.models import reservations
-import datetime
+from reservations.views import numbers_to_weekday
 
-# Create your views here.
+
+
+
+# Utility functions ------------------------------------------------------------
+
+
+
+
+# views ------------------------------------------------------------------------
 def createrestaurant(request):
     restaurant = restaurants.objects.filter(owner__username__contains=request.user)
     restaurant_form = restaurantsForm()
@@ -55,7 +63,7 @@ def restaurantmenu(request, restaurant_pk):
     reservation_dinner = reservations.objects.filter(restaurant__pk__exact=restaurant_pk,
                                                      date__contains=choosenday,
                                                      shift__contains='Dinner')
-    choosenday = datetime.datetime.strptime(choosenday,"%Y-%m-%d")
+    choosenday = datetime.strptime(choosenday,"%Y-%m-%d")
     choosenday = choosenday.strftime("%m/%d/%Y")
     if request.method == 'POST':
         choosenday = request.POST.get('choosenday',today.strftime("%Y-%m-%d"))
@@ -132,7 +140,6 @@ def createTables(request, restaurant_pk):
     restaurant = restaurants.objects.filter(owner__username__contains=request.user,pk__exact=restaurant_pk)
     owner_restaurants = restaurants.objects.filter(owner__username__contains=request.user)
     data = tables.objects.filter(restaurant__pk__exact=restaurant_pk)
-    print(data)
     form = tablesForm()
 
     if request.method == 'POST':

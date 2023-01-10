@@ -7,14 +7,14 @@
   <div class="row justify-content-start">
     <div class="col-12 col-md-4">
       {% if form_pk != 'False' %}
-      <input type="button" value="Voltar" class="btn btn-primary mt-4" onclick="history.back()">
+      <input type="button" value="Voltar" class="btn btn-dark mt-4" onclick="history.back()">
       {% else %}
       <form method="post">
         {% csrf_token %}
         {% if create_form == 'True' %}
-        <input type="button" value="Voltar" class="btn btn-primary mt-4" onclick="history.back()">
+        <input type="button" value="Voltar" class="btn btn-dark mt-4" onclick="history.back()">
         {% else %}
-        <button class="btn btn-primary mt-4" value="True"  type="submit" name="create_form">Criar estimativa de tempo</button>
+        <button class="btn btn-dark mt-4" value="True"  type="submit" name="create_form">Criar estimativa de tempo</button>
         {% endif %}
         {% endif %}
       </form>
@@ -29,7 +29,7 @@
       <form  method="post">
         {% csrf_token %}
         {{ form|crispy }}
-        <button class="btn btn-primary " type="submit" name="save_form" value="True">Criar</button>
+        <button class="btn btn-dark " type="submit" name="save_form" value="True">Criar</button>
       </form>
       {% else %}
       {% if form_pk != 'False' %}
@@ -37,7 +37,7 @@
           {% csrf_token %}
           {{ form_update|crispy }}
           <input type="hidden" name="form_pk" value="{{form_pk}}">
-          <button class="btn btn-primary" type="submit" name="save_form_update" value="True">Guardar</button>
+          <button class="btn btn-dark" type="submit" name="save_form_update" value="True">Guardar</button>
         </form>
       {% else %}
       {% if delete != 'False' %}
@@ -45,9 +45,9 @@
         <form  method="post">
           {% csrf_token %}
           <input type="hidden" name="delete" value="{{delete}}">
-          <button class="btn btn-primary" type="submit" name="delete_confirm" value="True">Yes</button>
+          <button class="btn btn-dark" type="submit" name="delete_confirm" value="True">Yes</button>
         </form>
-        <input type="button" value="No" class="btn btn-primary mt-4" onclick="history.back()">
+        <input type="button" value="No" class="btn btn-dark mt-4" onclick="history.back()">
       {% else %}
       <table class="table">
         <thead class="thead-dark">
@@ -63,8 +63,8 @@
               <tr>
                 <td>{{x.number_of_people}}</td>
                 <td>{{x.estimated_time}}</td>
-                <td><form method="post">{% csrf_token %}<button class="btn btn-primary" type="submit" name="form_pk" value="{{x.pk}}">Editar</button></form></td>
-                <td><form method="post">{% csrf_token %}<button class="btn btn-primary" type="submit" name="delete" value="{{x.pk}}">Apagar</button></form></td></td>
+                <td><form method="post">{% csrf_token %}<button class="btn btn-dark" type="submit" name="form_pk" value="{{x.pk}}">Editar</button></form></td>
+                <td><form method="post">{% csrf_token %}<button class="btn btn-dark" type="submit" name="delete" value="{{x.pk}}">Apagar</button></form></td></td>
               </tr>
           {% endfor %}
         </tbody>

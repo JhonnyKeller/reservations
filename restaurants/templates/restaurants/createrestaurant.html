@@ -9,7 +9,7 @@
       {% csrf_token %}
       {{ restaurant_form|crispy }}
       <input type="hidden" name="if_create_true" value="True">
-      <button  class="btn mt-3 btn-primary">Create</button>
+      <button  class="btn mt-3 btn-dark">Create</button>
     </form>
 
 
@@ -25,7 +25,7 @@
           <p class="card-text">Click here to create a new restaurant Menu.</p>
           <form  method="post">
             {% csrf_token %}
-            <button name="if_create_true" value="True" class="btn btn-primary">Create a new restaurant Menu</button>
+            <button name="if_create_true" value="True" class="btn btn-dark">Create a new restaurant Menu</button>
           </form>
         </div>
       </div>
@@ -36,8 +36,8 @@
         <div class="card-body">
           <h5 class="card-title">{{y.restaurant_name}}</h5>
           <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-          <a href="{% url 'restaurantsview:restaurantmenu' restaurant_pk=y.pk %}" class="btn btn-primary">Menu</a>
-          <a href="{% url 'reservations:restaurant_reservation' username=user.username restaurantname=y.restaurant_name %}" class="btn btn-primary">Link to reservation</a>
+          <a href="{% url 'restaurantsview:restaurantmenu' restaurant_pk=y.pk %}" class="btn btn-dark">Menu</a>
+          <a href="{% url 'reservations:restaurant_reservation' username=user.username restaurantname=y.restaurant_name %}" class="btn btn-dark">Link to reservation</a>
         </div>
       </div>
     </div>

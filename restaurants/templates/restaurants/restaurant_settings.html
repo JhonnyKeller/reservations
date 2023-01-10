@@ -19,7 +19,7 @@
           {% csrf_token %}
           {{ form_update|crispy }}
           {{ form_update_time_divider|crispy }}
-          <button class="btn btn-primary" type="submit">Guardar</button>
+          <button class="btn btn-dark" type="submit">Guardar</button>
         </form>
         <div class="col-12 col-md-2">
           <h4 class="mt-5" style="color:green;">Saved!</h4>
@@ -30,7 +30,7 @@
           {{ form_update|crispy }}
           {{ form_update_time_divider|crispy }}
           <input type="hidden" name="form_pk" value="{{form_pk}}">
-          <button class="btn btn-primary mt-2" type="submit" name="save_form_update" value="True">Guardar</button>
+          <button class="btn btn-dark mt-2" type="submit" name="save_form_update" value="True">Guardar</button>
         </form>
         {% endif %}
     </div>

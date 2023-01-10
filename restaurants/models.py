@@ -60,7 +60,12 @@ class restaurantOpenDaysOfTheWeek(models.Model):
 
 class closedExceptions(models.Model):
     restaurant = models.ForeignKey(restaurants,related_name='restaurantclosedexceptions',on_delete=models.CASCADE)
-    closed_days = models.DateField()
+    closed_days_start = models.DateField(default=datetime.now)
+    closed_days_end = models.DateField(default=datetime.now)
+    time_start = models.TimeField(default=datetime.now)
+    time_end = models.TimeField(default=datetime.now)
+    number_of_acceptance = models.CharField(max_length=254, default='')
+
 
     def __int__(self):
         return self.closed_days
