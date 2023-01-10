@@ -298,7 +298,7 @@ def numbers_to_weekday(argument):
         4: "Thursday",
         5: "Friday",
         6: "Saturday",
-        7: "Sunday",
+        0: "Sunday",
     }
     return switcher.get(argument, '')
 
