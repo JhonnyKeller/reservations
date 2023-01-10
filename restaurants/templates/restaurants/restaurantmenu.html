@@ -8,12 +8,11 @@
       var dateToday = new Date();
 
       $('#datepicker').datepicker({
-          minDate: dateToday,
           beforeShowDay: function (date) {
                               var day = date.getDay(),
                bDisable = arrDisabledDates[date];
               if (bDisable) return [false, '', '']
-              else return [(day != 2) && (day != 1)]
+              else return [day=10]
           }
       });
   });
