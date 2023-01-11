@@ -34,15 +34,6 @@ class tables(models.Model):
         return self.table_number
 
 class restaurantOpenDaysOfTheWeek(models.Model):
-    weekdays = (
-        ('Monday', 'Monday'),
-        ('Tuesday', 'Tuesday'),
-        ('Wednesday', 'Wednesday'),
-        ('Thursday', 'Thursday'),
-        ('Friday', 'Friday'),
-        ('Saturday', 'Saturday'),
-        ('Sunday', 'Sunday'),
-    )
     shifts = (
         ('Breakfast', 'Breakfast'),
         ('Lunch', 'Lunch'),
@@ -50,13 +41,19 @@ class restaurantOpenDaysOfTheWeek(models.Model):
     )
 
     restaurant = models.ForeignKey(restaurants,related_name='restaurantopentime',on_delete=models.CASCADE)
-    weekday = models.CharField(max_length=254,choices=weekdays)
+    Monday = models.BooleanField(default=0)
+    Tuesday = models.BooleanField(default=0)
+    Wednesday = models.BooleanField(default=0)
+    Thursday = models.BooleanField(default=0)
+    Friday = models.BooleanField(default=0)
+    Saturday = models.BooleanField(default=0)
+    Sunday = models.BooleanField(default=0)
     shift = models.CharField(max_length=254,choices=shifts)
     start_time = models.TimeField()
     end_time = models.TimeField()
 
     def __str__(self):
-        return self.weekday
+        return self.shift
 
 class closedExceptions(models.Model):
     restaurant = models.ForeignKey(restaurants,related_name='restaurantclosedexceptions',on_delete=models.CASCADE)
@@ -93,7 +90,7 @@ class limitOfCustomersPerHour(models.Model):
 
 
     def __int__(self):
-        return self.weekdays
+        return self.start_time
 
 class timeDivider(models.Model):
     minutes = (

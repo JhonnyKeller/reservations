@@ -265,22 +265,71 @@ def retrieveTablesUsed(date, shift, restaurantname):
             tu.append(y.estimatedtime)
     return tu
 
+def return_correct_weekday_filter(restaurant,weekday):
+    filter = []
+    if weekday == 'Monday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Monday=True)
+        print('m')
+    if weekday == 'Tuesday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Tuesday=True)
+        print('m')
+    if weekday == 'Wednesday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Wednesday=True)
+        print('m')
+    if weekday == 'Thursday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Thursday=True)
+        print('m')
+    if weekday == 'Friday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Friday=True)
+        print('m')
+    if weekday == 'Saturday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Saturday=True)
+        print('m')
+    if weekday == 'Sunday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Sunday=True)
+        print(filter)
+    return filter
 
-def checkIfThereIsWeekDay(weekday, value):
-    weekday = restaurantOpenDaysOfTheWeek.objects.filter(weekday__contains=weekday)
+def return_correct_weekday_filter_w_shift(restaurant,weekday,shift):
+    filter = []
+    if weekday == 'Monday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Monday=True,shift__contains=shift)
+        print('m')
+    if weekday == 'Tuesday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Tuesday=True,shift__contains=shift)
+        print('m')
+    if weekday == 'Wednesday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Wednesday=True,shift__contains=shift)
+        print('m')
+    if weekday == 'Thursday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Thursday=True,shift__contains=shift)
+        print('m')
+    if weekday == 'Friday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Friday=True,shift__contains=shift)
+        print('m')
+    if weekday == 'Saturday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Saturday=True,shift__contains=shift)
+        print('m')
+    if weekday == 'Sunday':
+        filter = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,Sunday=True,shift__contains=shift)
+        print('m')
+    return filter
+
+def checkIfThereIsWeekDay(weekday, value, restaurant):
+    weekday = return_correct_weekday_filter(restaurant,weekday)
     if weekday.count() <= 0:
         return value
     return None
 
-def return_weekdays_not_open():
+def return_weekdays_not_open(restaurant):
     weekdaysnotopen = []
-    weekdaysnotopen.append(checkIfThereIsWeekDay('Monday', 1))
-    weekdaysnotopen.append(checkIfThereIsWeekDay('Tuesday', 2))
-    weekdaysnotopen.append(checkIfThereIsWeekDay('Wenesday', 3))
-    weekdaysnotopen.append(checkIfThereIsWeekDay('Thursday', 4))
-    weekdaysnotopen.append(checkIfThereIsWeekDay('Friday', 5))
-    weekdaysnotopen.append(checkIfThereIsWeekDay('Saturday', 6))
-    weekdaysnotopen.append(checkIfThereIsWeekDay('Sunday', 0))
+    weekdaysnotopen.append(checkIfThereIsWeekDay('Monday', 1, restaurant))
+    weekdaysnotopen.append(checkIfThereIsWeekDay('Tuesday', 2, restaurant))
+    weekdaysnotopen.append(checkIfThereIsWeekDay('Wednesday', 3, restaurant))
+    weekdaysnotopen.append(checkIfThereIsWeekDay('Thursday', 4, restaurant))
+    weekdaysnotopen.append(checkIfThereIsWeekDay('Friday', 5, restaurant))
+    weekdaysnotopen.append(checkIfThereIsWeekDay('Saturday', 6, restaurant))
+    weekdaysnotopen.append(checkIfThereIsWeekDay('Sunday', 0, restaurant))
     new_string = ''
     for e in weekdaysnotopen:
         if e != None:
@@ -324,9 +373,7 @@ def returnStringOfClosedExceptions(restaurant):
             lowest_start_time = ''
             higher_end_time = ''
             while start_day <= end_day:
-                filter_weekday = restaurantOpenDaysOfTheWeek.objects.filter(restaurant__restaurant_name__contains=restaurant,weekday__contains=numbers_to_weekday(start_day.isoweekday()))
-                print('filter_weekday')
-                print(filter_weekday)
+                filter_weekday = return_correct_weekday_filter(restaurant,numbers_to_weekday(start_day.isoweekday()))
                 for y in filter_weekday:
                     if lowest_start_time == '':
                         lowest_start_time = y.start_time
@@ -375,7 +422,7 @@ def reservationss(request, username, restaurantname):
     # choosenday = datetime.strptime(today, '%m/%d/%Y')
     choosen_day =  today.strftime("%m/%d/%Y")
     form = reservationsForm()
-    weekdaysnotopen = return_weekdays_not_open()
+    weekdaysnotopen = return_weekdays_not_open(restaurantname)
     print('weekdaysnotopen')
     print(weekdaysnotopen)
     closed_exceptions = closedExceptions.objects.filter(restaurant__restaurant_name__contains=restaurantname)
@@ -391,15 +438,12 @@ def reservationss(request, username, restaurantname):
             choosenday = datetime.strptime(choosenday, '%Y-%m-%d')
             weekday = numbers_to_weekday(choosenday.isoweekday())
             reservation = reservations.objects.filter(date__contains=choosenday)
-            weekfilter = restaurantOpenDaysOfTheWeek.objects.filter(weekday__contains=weekday,
-                                                                    restaurant__restaurant_name__contains=restaurantname)
+            weekfilter = return_correct_weekday_filter(restaurantname,weekday)
             tu = retrieveTablesUsed(choosenday, shift, restaurantname)
             time_divider = timeDivider.objects.filter(restaurant__restaurant_name__contains=restaurantname)
             time_divider = time_divider[0].each_time
             time_divider_list = time_divider.split(":")
-            weekfilter = restaurantOpenDaysOfTheWeek.objects.filter(weekday__contains=weekday,
-                                                                    restaurant__restaurant_name__contains=restaurantname,
-                                                                    shift__contains=shift)
+            weekfilter = return_correct_weekday_filter_w_shift(restaurantname,weekday,shift)
             hours_list = []
             for y in weekfilter:
                 starttime = y.start_time
@@ -442,16 +486,12 @@ def reservationss(request, username, restaurantname):
             choosenday = datetime.strptime(choosenday, '%m/%d/%Y')
             weekday = numbers_to_weekday(choosenday.isoweekday())
             reservation = reservations.objects.filter(date__contains=choosenday)
-            weekfilter = restaurantOpenDaysOfTheWeek.objects.filter(weekday__contains=weekday,
-                                                                    restaurant__restaurant_name__contains=restaurantname)
-
+            weekfilter = return_correct_weekday_filter(restaurantname,weekday)
             tu = retrieveTablesUsed(choosenday, shift, restaurantname)
             time_divider = timeDivider.objects.filter(restaurant__restaurant_name__contains=restaurantname)
             time_divider = time_divider[0].each_time
             time_divider_list = time_divider.split(":")
-            weekfilter = restaurantOpenDaysOfTheWeek.objects.filter(weekday__contains=weekday,
-                                                                    restaurant__restaurant_name__contains=restaurantname,
-                                                                    shift__contains=shift)
+            weekfilter = return_correct_weekday_filter_w_shift(restaurantname,weekday,shift)
             hours_list = []
             for y in weekfilter:
                 starttime = y.start_time
