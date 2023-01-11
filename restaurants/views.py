@@ -67,7 +67,7 @@ def restaurantmenu(request, restaurant_pk):
     choosenday = choosenday.strftime("%m/%d/%Y")
     if request.method == 'POST':
         choosenday = request.POST.get('choosenday',today.strftime("%Y-%m-%d"))
-        choosenday = datetime.datetime.strptime(choosenday,"%m/%d/%Y")
+        choosenday = datetime.strptime(choosenday,"%m/%d/%Y")
         reservation_breakfast = reservations.objects.filter(restaurant__pk__contains=restaurant_pk,
                                                             date__contains=choosenday.strftime("%Y-%m-%d"),
                                                             shift__contains='Breakfast')
