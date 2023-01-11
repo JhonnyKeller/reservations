@@ -3,3 +3,4 @@ migrations/
 reservationsEnv/
 db.sqlite3
 .env
+media/
