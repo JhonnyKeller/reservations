@@ -27,6 +27,8 @@ def verify_hour_availability(time_to_check,start_time,end_time,estimated_time):
 
 def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated_time, restaurant_name, hours_list):
     connect_logic = numberOfPeopleWhenTablesConnect.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
+    print('connect_logic')
+    print(connect_logic)
     restaurant_tables = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
     zones = placeOfTable.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
     availabletimes = []
@@ -95,7 +97,7 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                 if verify_hour == False:
                                     break
                         if verify_hour or temporary_table_two == []:
-                            check_table = tables.objects.filter(table_number__contains=can_connect_list[ccl_two])
+                            check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list[ccl_two])
                             save_necessary_people_two = save_necessary_people_one
                             save_necessary_people_two -= int(check_table[0].number_of_seats) + connect_logic[0].number_of_chairs
                             used_table_list_one = used_table_list
@@ -127,7 +129,7 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                         if verify_hour == False:
                                             break
                                 if verify_hour or temporary_table_three == []:
-                                    check_table = tables.objects.filter(table_number__contains=can_connect_list_two[ccl_three])
+                                    check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_two[ccl_three])
                                     save_necessary_people_three = save_necessary_people_two
                                     save_necessary_people_three -= int(check_table[0].number_of_seats) + connect_logic[1].number_of_chairs
                                     used_table_list_two = used_table_list_one
@@ -159,7 +161,7 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                                 if verify_hour == False:
                                                     break
                                         if verify_hour or temporary_table_four == []:
-                                            check_table = tables.objects.filter(table_number__contains=can_connect_list_three[ccl_four])
+                                            check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_three[ccl_four])
                                             save_necessary_people_four = save_necessary_people_three
                                             save_necessary_people_four -= int(check_table[0].number_of_seats) + connect_logic[2].number_of_chairs
                                             used_table_list_three = used_table_list_two
@@ -191,7 +193,7 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                                         if verify_hour == False:
                                                             break
                                                 if verify_hour or temporary_table_five == []:
-                                                    check_table = tables.objects.filter(table_number__contains=can_connect_list_four[ccl_five])
+                                                    check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_four[ccl_five])
                                                     save_necessary_people_five = save_necessary_people_four
                                                     save_necessary_people_five -= int(check_table[0].number_of_seats) + connect_logic[1].number_of_chairs
                                                     used_table_list_four = used_table_list_three
@@ -224,7 +226,7 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                                                                 if verify_hour == False:
                                                                     break
                                                         if verify_hour or temporary_table_six == []:
-                                                            check_table = tables.objects.filter(table_number__contains=can_connect_list_five[ccl_six])
+                                                            check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_five[ccl_six])
                                                             save_necessary_people_six = save_necessary_people_five
                                                             save_necessary_people_six -= int(check_table[0].number_of_seats) + connect_logic[2].number_of_chairs
                                                             used_table_list_five = used_table_list_four
@@ -351,10 +353,10 @@ def numbers_to_weekday(argument):
     }
     return switcher.get(argument, '')
 
-def return_estimated_time(number_of_people):
-    estimated_time = estimatedTimeCustomersSpend.objects.filter(number_of_people__gte=number_of_people)
+def return_estimated_time(number_of_people, restaurant_name):
+    estimated_time = estimatedTimeCustomersSpend.objects.filter(restaurant__restaurant_name__contains=restaurant_name,number_of_people__gte=number_of_people)
     if estimated_time.count() <= 0:
-        estimated_time = estimatedTimeCustomersSpend.objects.filter(number_of_people__lte=number_of_people)
+        estimated_time = estimatedTimeCustomersSpend.objects.filter(restaurant__restaurant_name__contains=restaurant_name,number_of_people__lte=number_of_people)
         estimative = estimated_time[estimated_time.count()-1].estimated_time
     else:
         estimative = estimated_time[0].estimated_time
@@ -453,7 +455,7 @@ def reservationss(request, username, restaurantname):
                 while starttime < endtime:
                     hours_list.append(str(starttime))
                     starttime = starttime + timedelta(hours=int(time_divider_list[0]),minutes=int(time_divider_list[1]))
-            estimated_time = return_estimated_time(int(number_of_people))
+            estimated_time = return_estimated_time(int(number_of_people), restaurantname)
             open_time = retrieveAvailableHoursToReservation(tu, int(number_of_people), estimated_time, restaurantname, hours_list)
             zones = placeOfTable.objects.filter(restaurant__restaurant_name__contains=restaurantname)
             xi = 0
@@ -501,7 +503,7 @@ def reservationss(request, username, restaurantname):
                 while starttime < endtime:
                     hours_list.append(str(starttime))
                     starttime = starttime + timedelta(hours=int(time_divider_list[0]),minutes=int(time_divider_list[1]))
-            estimated_time = return_estimated_time(int(number_of_people))
+            estimated_time = return_estimated_time(int(number_of_people), restaurantname)
             zones =placeOfTable.objects.filter(restaurant__restaurant_name__contains=restaurantname)
             open_time = retrieveAvailableHoursToReservation(tu, int(number_of_people), estimated_time, restaurantname, hours_list)
             hours_list = time[:5]
@@ -515,7 +517,7 @@ def reservationss(request, username, restaurantname):
 
             place_of_table_of_time = time[13:]
             list_hours = []
-            list_hours.append(hours_list)
+            list_hours.append(hours_list + ':00')
             zone = time[13:]
             assign_tables = assignThTables(tu, int(number_of_people), estimated_time, restaurantname, list_hours, zone)
             table_list = ''

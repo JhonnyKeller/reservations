@@ -8,6 +8,22 @@ from datetime import datetime
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 
+
+def verify_hour_availability(time_to_check,start_time,end_time,estimated_time):
+    time_to_check = datetime.strptime(time_to_check, '%H:%M:%S')
+    start_time += ':00'
+    start_time = datetime.strptime(start_time, '%H:%M:%S')
+    end_time += ':00'
+    end_time = datetime.strptime(end_time, '%H:%M:%S')
+    estimated_time = estimated_time.split(":")
+    if time_to_check >= start_time and time_to_check <= end_time:
+        return False
+    time_to_check = time_to_check + timedelta(hours=int(estimated_time[0]),minutes=int(estimated_time[1]))
+    if time_to_check >= start_time and time_to_check <= end_time:
+        return False
+
+    return True
+
 def assignThTables(tables_used, necessary_people, estimated_time, restaurant_name, hours_list, zone):
     connect_logic = numberOfPeopleWhenTablesConnect.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
     restaurant_tables = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
