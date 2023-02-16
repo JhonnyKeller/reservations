@@ -8,6 +8,8 @@ from datetime import datetime
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 from .assign_tables_function import assignThTables
+from rest_framework import generics
+from .serializers import reservationsSerializer
 
 
 def verify_hour_availability(time_to_check,start_time,end_time,estimated_time):
@@ -25,13 +27,79 @@ def verify_hour_availability(time_to_check,start_time,end_time,estimated_time):
 
     return True
 
+
+
+def find_tables(the_hours,estimated_time,can_connect_list,used_table_list,save_necessary_people,connect_logic_number,tables_used,connect_logic):
+    temporary_table = []
+    found_table = 3
+    for utl in range(0, len(used_table_list), 1):
+        for ccll in can_connect_list:
+            if ccll == used_table_list[utl]:
+                can_connect_list.remove(used_table_list[utl])
+    for ccl in range(0,len(can_connect_list),1):
+        for i in range(0, len(tables_used), 3):
+            if int(tables_used[i])  == int(can_connect_list[ccl]):
+                temporary_table.append(tables_used[i])
+                temporary_table.append(tables_used[i+1])
+                temporary_table.append(tables_used[i+2])
+        verify_hour = False
+        if temporary_table != []:
+            for tt in range(0,len(temporary_table),3):
+                for kk in range(0,len(temporary_table),3):
+                    verify_hour = verify_hour_availability(the_hours,temporary_table[kk+1],temporary_table[kk+2],estimated_time)
+                    if verify_hour == False:
+                        break
+                if verify_hour:
+                    check_table = tables.objects.filter(table_number__contains=can_connect_list[ccl])
+                    save_necessary_people_two = save_necessary_people
+                    save_necessary_people_two -= int(check_table[0].number_of_seats) + connect_logic[connect_logic_number].number_of_chairs
+                    used_table_list_one = used_table_list
+                    used_table_list_one.append(can_connect_list[ccl])
+                    if save_necessary_people_two <= 0:
+                        return 1
+                    else:
+                        if connect_logic_number == 0:
+                            connect_logic_number += 1
+                        elif connect_logic_number == 2:
+                            connect_logic_number -= 1
+                        else:
+                            connect_logic_number += 1
+                        can_connect_list_two = check_table[0].can_connect_tables[:]
+                        can_connect_list_two = can_connect_list_two.split(',')
+                        found_table = find_tables(the_hours,estimated_time,can_connect_list_two,used_table_list_one,save_necessary_people_two,connect_logic_number,tables_used,connect_logic)
+                        if found_table == 1:
+                            print('returns 1 here at 1')
+                            return 1
+        if temporary_table == []:
+            check_table = tables.objects.filter(table_number__contains=can_connect_list[ccl])
+            save_necessary_people_two = save_necessary_people
+            save_necessary_people_two -= int(check_table[0].number_of_seats) + connect_logic[connect_logic_number].number_of_chairs
+            used_table_list_one = used_table_list
+            used_table_list_one.append(can_connect_list[ccl])
+            if save_necessary_people_two <= 0:
+                return 1
+            else:
+                if connect_logic_number == 0:
+                    connect_logic_number += 1
+                elif connect_logic_number == 2:
+                    connect_logic_number -= 1
+                else:
+                    connect_logic_number += 1
+                can_connect_list_two = check_table[0].can_connect_tables[:]
+                can_connect_list_two = can_connect_list_two.split(',')
+                found_table = find_tables(the_hours,estimated_time,can_connect_list_two,used_table_list_one,save_necessary_people_two,connect_logic_number,tables_used,connect_logic)
+                if found_table == 1:
+                    return 1
+                    print('returns 1 here at 2')
+    return 0
+
+
 def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated_time, restaurant_name, hours_list):
     connect_logic = numberOfPeopleWhenTablesConnect.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
-    print('connect_logic')
-    print(connect_logic)
     restaurant_tables = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
     zones = placeOfTable.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
     availabletimes = []
+
     for x in zones:
         tables_zone = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,place_of_table__pk__contains=x.pk)
         availabletimes.append(x.place_of_table)
@@ -54,13 +122,35 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                         temporary_table.append(tables_used[i+1])
                         temporary_table.append(tables_used[i+2])
                 verify_hour = False
-                temporary_table_two = []
                 if temporary_table != []:
                     for tt in range(0,len(temporary_table),3):
-                        verify_hour = verify_hour_availability(the_hours[ii],temporary_table[tt+1],temporary_table[tt+2],estimated_time)
-                        if verify_hour == False:
-                            break
-                if verify_hour or temporary_table == []:
+                        for kk in range(0,len(temporary_table),3):
+                            verify_hour = verify_hour_availability(the_hours[ii],temporary_table[kk+1],temporary_table[kk+2],estimated_time)
+                            if verify_hour == False:
+                                break
+                        if verify_hour:
+                            save_necessary_people_one = save_necessary_people
+                            save_necessary_people_one -= int(y.number_of_seats)
+                            used_table_list.append(y.table_number)
+                            if save_necessary_people_one <= 0 and temporary_table == []:
+                                ni = 0
+                                while the_hours != []:
+                                    availabletimes.append(the_hours[ni])
+                                    the_hours.remove(the_hours[ni])
+                                break
+                            if save_necessary_people_one <= 0:
+                                availabletimes.append(the_hours[ii])
+                                the_hours.remove(the_hours[ii])
+                                ii -= 1
+                            can_connect_list = y.can_connect_tables[:]
+                            can_connect_list = can_connect_list.split(',')
+                            find_the_table = find_tables(the_hours[ii],estimated_time,can_connect_list,used_table_list,save_necessary_people_one,0,tables_used,connect_logic)
+                            if find_the_table == 1:
+                                availabletimes.append(the_hours[ii])
+                                the_hours.remove(the_hours[ii])
+                                ii -= 1
+                if temporary_table == []:
+                    print('here two')
                     save_necessary_people_one = save_necessary_people
                     save_necessary_people_one -= int(y.number_of_seats)
                     used_table_list.append(y.table_number)
@@ -74,179 +164,239 @@ def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated
                         availabletimes.append(the_hours[ii])
                         the_hours.remove(the_hours[ii])
                         ii -= 1
-                        break
+
                     can_connect_list = y.can_connect_tables[:]
                     can_connect_list = can_connect_list.split(',')
-                    for utl in range(0, len(used_table_list), 1):
-                        for ccll in can_connect_list:
-                            if ccll == utl:
-                                can_connect_list.remove(used_table_list[utl])
-                    for ccl_two in range(0,len(can_connect_list),1):
-                        if ii == -1:
-                            break
-                        for i in range(0, len(tables_used), 3):
-                            if int(tables_used[i])  == int(can_connect_list[ccl_two]):
-                                temporary_table_two.append(tables_used[i])
-                                temporary_table_two.append(tables_used[i+1])
-                                temporary_table_two.append(tables_used[i+2])
-                        verify_hour = False
-                        temporary_table_three = []
-                        if temporary_table_two != []:
-                            for tt in range(0,len(temporary_table_two),3):
-                                verify_hour = verify_hour_availability(the_hours[ii],temporary_table_two[tt+1],temporary_table_two[tt+2],estimated_time)
-                                if verify_hour == False:
-                                    break
-                        if verify_hour or temporary_table_two == []:
-                            check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list[ccl_two])
-                            save_necessary_people_two = save_necessary_people_one
-                            save_necessary_people_two -= int(check_table[0].number_of_seats) + connect_logic[0].number_of_chairs
-                            used_table_list_one = used_table_list
-                            used_table_list_one.append(can_connect_list[ccl_two])
-                            if save_necessary_people_two <= 0:
-                                availabletimes.append(the_hours[ii])
-                                the_hours.remove(the_hours[ii])
-                                ii -= 1
-                                break
-                            can_connect_list_two = check_table[0].can_connect_tables[:]
-                            can_connect_list_two = can_connect_list_two.split(',')
-                            for utl in range(0, len(used_table_list_one), 1):
-                                for ccll in can_connect_list_two:
-                                    if ccll == used_table_list_one[utl]:
-                                        can_connect_list_two.remove(used_table_list_one[utl])
-                            for ccl_three in range(0,len(can_connect_list_two),1):
-                                if ii == -1:
-                                    break
-                                for i in range(0, len(tables_used), 3):
-                                    if int(tables_used[i]) == int(can_connect_list_two[ccl_three]):
-                                        temporary_table_three.append(tables_used[i])
-                                        temporary_table_three.append(tables_used[i+1])
-                                        temporary_table_three.append(tables_used[i+2])
-                                verify_hour = False
-                                temporary_table_four = []
-                                if temporary_table_three != []:
-                                    for tt in range(0,len(temporary_table_three),3):
-                                        verify_hour = verify_hour_availability(the_hours[ii],temporary_table_three[tt+1],temporary_table_three[tt+2],estimated_time)
-                                        if verify_hour == False:
-                                            break
-                                if verify_hour or temporary_table_three == []:
-                                    check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_two[ccl_three])
-                                    save_necessary_people_three = save_necessary_people_two
-                                    save_necessary_people_three -= int(check_table[0].number_of_seats) + connect_logic[1].number_of_chairs
-                                    used_table_list_two = used_table_list_one
-                                    used_table_list_two.append(can_connect_list_two[ccl_three])
-                                    if save_necessary_people_three <= 0:
-                                        availabletimes.append(the_hours[ii])
-                                        the_hours.remove(the_hours[ii])
-                                        ii -= 1
-                                        break
-                                    can_connect_list_three = check_table[0].can_connect_tables[:]
-                                    can_connect_list_three = can_connect_list_three.split(',')
-                                    for utl in range(0, len(used_table_list_two), 1):
-                                        for ccll in can_connect_list_three:
-                                            if ccll == used_table_list_two[utl]:
-                                                can_connect_list_three.remove(used_table_list_two[utl])
-                                    for ccl_four in range(0,len(can_connect_list_three),1):
-                                        if ii == -1:
-                                            break
-                                        for i in range(0, len(tables_used), 3):
-                                            if int(tables_used[i]) == int(can_connect_list_three[ccl_four]):
-                                                temporary_table_four.append(tables_used[i])
-                                                temporary_table_four.append(tables_used[i+1])
-                                                temporary_table_four.append(tables_used[i+2])
-                                        verify_hour = False
-                                        temporary_table_five = []
-                                        if temporary_table_four != []:
-                                            for tt in range(0,len(temporary_table_four),3):
-                                                verify_hour = verify_hour_availability(the_hours[ii],temporary_table_four[tt+1],temporary_table_four[tt+2],estimated_time)
-                                                if verify_hour == False:
-                                                    break
-                                        if verify_hour or temporary_table_four == []:
-                                            check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_three[ccl_four])
-                                            save_necessary_people_four = save_necessary_people_three
-                                            save_necessary_people_four -= int(check_table[0].number_of_seats) + connect_logic[2].number_of_chairs
-                                            used_table_list_three = used_table_list_two
-                                            used_table_list_three.append(can_connect_list_three[ccl_four])
-                                            if save_necessary_people_four <= 0:
-                                                availabletimes.append(the_hours[ii])
-                                                the_hours.remove(the_hours[ii])
-                                                ii -= 1
-                                                break
-                                            can_connect_list_four = check_table[0].can_connect_tables[:]
-                                            can_connect_list_four = can_connect_list_four.split(',')
-                                            for utl in range(0, len(used_table_list_three), 1):
-                                                for ccll in can_connect_list_four:
-                                                    if ccll == used_table_list_three[utl]:
-                                                        can_connect_list_four.remove(used_table_list_three[utl])
-                                            for ccl_five in range(0,len(can_connect_list_four),1):
-                                                if ii == -1:
-                                                    break
-                                                for i in range(0, len(tables_used), 3):
-                                                    if int(tables_used[i]) == int(can_connect_list_four[ccl_five]):
-                                                        temporary_table_five.append(tables_used[i])
-                                                        temporary_table_five.append(tables_used[i+1])
-                                                        temporary_table_five.append(tables_used[i+2])
-                                                verify_hour = False
-                                                temporary_table_six = []
-                                                if temporary_table_five != []:
-                                                    for tt in range(0,len(temporary_table_five),3):
-                                                        verify_hour = verify_hour_availability(the_hours[ii],temporary_table_five[tt+1],temporary_table_five[tt+2],estimated_time)
-                                                        if verify_hour == False:
-                                                            break
-                                                if verify_hour or temporary_table_five == []:
-                                                    check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_four[ccl_five])
-                                                    save_necessary_people_five = save_necessary_people_four
-                                                    save_necessary_people_five -= int(check_table[0].number_of_seats) + connect_logic[1].number_of_chairs
-                                                    used_table_list_four = used_table_list_three
-                                                    used_table_list_four.append(can_connect_list_four[ccl_five])
-                                                    if save_necessary_people_five <= 0:
-                                                        print(ii)
-                                                        availabletimes.append(the_hours[ii])
-                                                        the_hours.remove(the_hours[ii])
-                                                        ii -= 1
-                                                        break
-                                                    can_connect_list_five = check_table[0].can_connect_tables[:]
-                                                    can_connect_list_five = can_connect_list_five.split(',')
-                                                    for utl in range(0, len(used_table_list_four), 1):
-                                                        for ccll in can_connect_list_five:
-                                                            if ccll == used_table_list_four[utl]:
-                                                                can_connect_list_five.remove(used_table_list_four[utl])
-                                                    for ccl_six in range(0,len(can_connect_list_five),1):
-                                                        if ii == -1:
-                                                            break
-                                                        for i in range(0, len(tables_used), 3):
-                                                            if int(tables_used[i]) == int(can_connect_list_five[ccl_six]):
-                                                                temporary_table_six.append(tables_used[i])
-                                                                temporary_table_six.append(tables_used[i+1])
-                                                                temporary_table_six.append(tables_used[i+2])
-                                                        verify_hour = False
-                                                        temporary_table_seven = []
-                                                        if temporary_table_six != []:
-                                                            for tt in range(0,len(temporary_table_six),3):
-                                                                verify_hour = verify_hour_availability(the_hours[ii],temporary_table_six[tt+1],temporary_table_six[tt+2],estimated_time)
-                                                                if verify_hour == False:
-                                                                    break
-                                                        if verify_hour or temporary_table_six == []:
-                                                            check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_five[ccl_six])
-                                                            save_necessary_people_six = save_necessary_people_five
-                                                            save_necessary_people_six -= int(check_table[0].number_of_seats) + connect_logic[2].number_of_chairs
-                                                            used_table_list_five = used_table_list_four
-                                                            used_table_list_five.append(can_connect_list_five[ccl_six])
-                                                            if save_necessary_people_six <= 0:
-                                                                print(ii)
-                                                                print(the_hours)
-                                                                availabletimes.append(the_hours[ii])
-                                                                the_hours.remove(the_hours[ii])
-                                                                ii -= 1
-                                                                break
-                                                            can_connect_list_six = check_table[0].can_connect_tables[:]
-                                                            can_connect_list_six = can_connect_list_six.split(',')
-                                                            for utl in range(0, len(used_table_list_five), 1):
-                                                                for ccll in can_connect_list_six:
-                                                                    if ccll == used_table_list_five[utl]:
-                                                                        can_connect_list_six.remove(used_table_list_five[utl])
-
-
+                    find_the_table = find_tables(the_hours[ii],estimated_time,can_connect_list,used_table_list,save_necessary_people_one,0,tables_used,connect_logic)
+                    if find_the_table == 1:
+                        availabletimes.append(the_hours[ii])
+                        the_hours.remove(the_hours[ii])
+                        ii -= 1
     return availabletimes
+
+
+# def retrieveAvailableHoursToReservation(tables_used, necessary_people, estimated_time, restaurant_name, hours_list):
+#     connect_logic = numberOfPeopleWhenTablesConnect.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
+#     print('connect_logic')
+#     print(connect_logic)
+#     restaurant_tables = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
+#     zones = placeOfTable.objects.filter(restaurant__restaurant_name__contains=restaurant_name)
+#     availabletimes = []
+#     for x in zones:
+#         tables_zone = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,place_of_table__pk__contains=x.pk)
+#         availabletimes.append(x.place_of_table)
+#         the_hours = hours_list[:]
+#         print('------------------zone---------------------')
+#         print(x)
+#         for y in tables_zone:
+#             print('------------------Current table---------------------')
+#             print(y)
+#             print(the_hours)
+#             ii = -1
+#             for hours_saved in range(0,len(the_hours),1):
+#                 ii += 1
+#                 save_necessary_people = necessary_people
+#                 temporary_table = []
+#                 used_table_list = []
+#                 for i in range(0, len(tables_used), 3):
+#                     if int(tables_used[i])  == int(y.table_number):
+#                         temporary_table.append(tables_used[i])
+#                         temporary_table.append(tables_used[i+1])
+#                         temporary_table.append(tables_used[i+2])
+#                 verify_hour = False
+#                 temporary_table_two = []
+#                 if temporary_table != []:
+#                     for tt in range(0,len(temporary_table),3):
+#                         verify_hour = verify_hour_availability(the_hours[ii],temporary_table[tt+1],temporary_table[tt+2],estimated_time)
+#                         if verify_hour == False:
+#                             break
+#                 if verify_hour or temporary_table == []:
+#                     save_necessary_people_one = save_necessary_people
+#                     save_necessary_people_one -= int(y.number_of_seats)
+#                     used_table_list.append(y.table_number)
+#                     if save_necessary_people_one <= 0 and temporary_table == []:
+#                         ni = 0
+#                         while the_hours != []:
+#                             availabletimes.append(the_hours[ni])
+#                             the_hours.remove(the_hours[ni])
+#                         break
+#                     if save_necessary_people_one <= 0:
+#                         availabletimes.append(the_hours[ii])
+#                         the_hours.remove(the_hours[ii])
+#                         ii -= 1
+#                         break
+#                     can_connect_list = y.can_connect_tables[:]
+#                     can_connect_list = can_connect_list.split(',')
+#                     for utl in range(0, len(used_table_list), 1):
+#                         for ccll in can_connect_list:
+#                             if ccll == utl:
+#                                 can_connect_list.remove(used_table_list[utl])
+#                     for ccl_two in range(0,len(can_connect_list),1):
+#                         if ii == -1:
+#                             break
+#                         for i in range(0, len(tables_used), 3):
+#                             if int(tables_used[i])  == int(can_connect_list[ccl_two]):
+#                                 temporary_table_two.append(tables_used[i])
+#                                 temporary_table_two.append(tables_used[i+1])
+#                                 temporary_table_two.append(tables_used[i+2])
+#                         verify_hour = False
+#                         temporary_table_three = []
+#                         if temporary_table_two != []:
+#                             for tt in range(0,len(temporary_table_two),3):
+#                                 verify_hour = verify_hour_availability(the_hours[ii],temporary_table_two[tt+1],temporary_table_two[tt+2],estimated_time)
+#                                 if verify_hour == False:
+#                                     break
+#                         if verify_hour or temporary_table_two == []:
+#                             check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list[ccl_two])
+#                             save_necessary_people_two = save_necessary_people_one
+#                             save_necessary_people_two -= int(check_table[0].number_of_seats) + connect_logic[0].number_of_chairs
+#                             used_table_list_one = used_table_list
+#                             used_table_list_one.append(can_connect_list[ccl_two])
+#                             if save_necessary_people_two <= 0:
+#                                 availabletimes.append(the_hours[ii])
+#                                 the_hours.remove(the_hours[ii])
+#                                 ii -= 1
+#                                 break
+#                             can_connect_list_two = check_table[0].can_connect_tables[:]
+#                             can_connect_list_two = can_connect_list_two.split(',')
+#                             for utl in range(0, len(used_table_list_one), 1):
+#                                 for ccll in can_connect_list_two:
+#                                     if ccll == used_table_list_one[utl]:
+#                                         can_connect_list_two.remove(used_table_list_one[utl])
+#                             for ccl_three in range(0,len(can_connect_list_two),1):
+#                                 if ii == -1:
+#                                     break
+#                                 for i in range(0, len(tables_used), 3):
+#                                     if int(tables_used[i]) == int(can_connect_list_two[ccl_three]):
+#                                         temporary_table_three.append(tables_used[i])
+#                                         temporary_table_three.append(tables_used[i+1])
+#                                         temporary_table_three.append(tables_used[i+2])
+#                                 verify_hour = False
+#                                 temporary_table_four = []
+#                                 if temporary_table_three != []:
+#                                     for tt in range(0,len(temporary_table_three),3):
+#                                         verify_hour = verify_hour_availability(the_hours[ii],temporary_table_three[tt+1],temporary_table_three[tt+2],estimated_time)
+#                                         if verify_hour == False:
+#                                             break
+#                                 if verify_hour or temporary_table_three == []:
+#                                     check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_two[ccl_three])
+#                                     save_necessary_people_three = save_necessary_people_two
+#                                     save_necessary_people_three -= int(check_table[0].number_of_seats) + connect_logic[1].number_of_chairs
+#                                     used_table_list_two = used_table_list_one
+#                                     used_table_list_two.append(can_connect_list_two[ccl_three])
+#                                     if save_necessary_people_three <= 0:
+#                                         availabletimes.append(the_hours[ii])
+#                                         the_hours.remove(the_hours[ii])
+#                                         ii -= 1
+#                                         break
+#                                     can_connect_list_three = check_table[0].can_connect_tables[:]
+#                                     can_connect_list_three = can_connect_list_three.split(',')
+#                                     for utl in range(0, len(used_table_list_two), 1):
+#                                         for ccll in can_connect_list_three:
+#                                             if ccll == used_table_list_two[utl]:
+#                                                 can_connect_list_three.remove(used_table_list_two[utl])
+#                                     for ccl_four in range(0,len(can_connect_list_three),1):
+#                                         if ii == -1:
+#                                             break
+#                                         for i in range(0, len(tables_used), 3):
+#                                             if int(tables_used[i]) == int(can_connect_list_three[ccl_four]):
+#                                                 temporary_table_four.append(tables_used[i])
+#                                                 temporary_table_four.append(tables_used[i+1])
+#                                                 temporary_table_four.append(tables_used[i+2])
+#                                         verify_hour = False
+#                                         temporary_table_five = []
+#                                         if temporary_table_four != []:
+#                                             for tt in range(0,len(temporary_table_four),3):
+#                                                 verify_hour = verify_hour_availability(the_hours[ii],temporary_table_four[tt+1],temporary_table_four[tt+2],estimated_time)
+#                                                 if verify_hour == False:
+#                                                     break
+#                                         if verify_hour or temporary_table_four == []:
+#                                             check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_three[ccl_four])
+#                                             save_necessary_people_four = save_necessary_people_three
+#                                             save_necessary_people_four -= int(check_table[0].number_of_seats) + connect_logic[2].number_of_chairs
+#                                             used_table_list_three = used_table_list_two
+#                                             used_table_list_three.append(can_connect_list_three[ccl_four])
+#                                             if save_necessary_people_four <= 0:
+#                                                 availabletimes.append(the_hours[ii])
+#                                                 the_hours.remove(the_hours[ii])
+#                                                 ii -= 1
+#                                                 break
+#                                             can_connect_list_four = check_table[0].can_connect_tables[:]
+#                                             can_connect_list_four = can_connect_list_four.split(',')
+#                                             for utl in range(0, len(used_table_list_three), 1):
+#                                                 for ccll in can_connect_list_four:
+#                                                     if ccll == used_table_list_three[utl]:
+#                                                         can_connect_list_four.remove(used_table_list_three[utl])
+#                                             for ccl_five in range(0,len(can_connect_list_four),1):
+#                                                 if ii == -1:
+#                                                     break
+#                                                 for i in range(0, len(tables_used), 3):
+#                                                     if int(tables_used[i]) == int(can_connect_list_four[ccl_five]):
+#                                                         temporary_table_five.append(tables_used[i])
+#                                                         temporary_table_five.append(tables_used[i+1])
+#                                                         temporary_table_five.append(tables_used[i+2])
+#                                                 verify_hour = False
+#                                                 temporary_table_six = []
+#                                                 if temporary_table_five != []:
+#                                                     for tt in range(0,len(temporary_table_five),3):
+#                                                         verify_hour = verify_hour_availability(the_hours[ii],temporary_table_five[tt+1],temporary_table_five[tt+2],estimated_time)
+#                                                         if verify_hour == False:
+#                                                             break
+#                                                 if verify_hour or temporary_table_five == []:
+#                                                     check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_four[ccl_five])
+#                                                     save_necessary_people_five = save_necessary_people_four
+#                                                     save_necessary_people_five -= int(check_table[0].number_of_seats) + connect_logic[1].number_of_chairs
+#                                                     used_table_list_four = used_table_list_three
+#                                                     used_table_list_four.append(can_connect_list_four[ccl_five])
+#                                                     if save_necessary_people_five <= 0:
+#                                                         print(ii)
+#                                                         availabletimes.append(the_hours[ii])
+#                                                         the_hours.remove(the_hours[ii])
+#                                                         ii -= 1
+#                                                         break
+#                                                     can_connect_list_five = check_table[0].can_connect_tables[:]
+#                                                     can_connect_list_five = can_connect_list_five.split(',')
+#                                                     for utl in range(0, len(used_table_list_four), 1):
+#                                                         for ccll in can_connect_list_five:
+#                                                             if ccll == used_table_list_four[utl]:
+#                                                                 can_connect_list_five.remove(used_table_list_four[utl])
+#                                                     for ccl_six in range(0,len(can_connect_list_five),1):
+#                                                         if ii == -1:
+#                                                             break
+#                                                         for i in range(0, len(tables_used), 3):
+#                                                             if int(tables_used[i]) == int(can_connect_list_five[ccl_six]):
+#                                                                 temporary_table_six.append(tables_used[i])
+#                                                                 temporary_table_six.append(tables_used[i+1])
+#                                                                 temporary_table_six.append(tables_used[i+2])
+#                                                         verify_hour = False
+#                                                         temporary_table_seven = []
+#                                                         if temporary_table_six != []:
+#                                                             for tt in range(0,len(temporary_table_six),3):
+#                                                                 verify_hour = verify_hour_availability(the_hours[ii],temporary_table_six[tt+1],temporary_table_six[tt+2],estimated_time)
+#                                                                 if verify_hour == False:
+#                                                                     break
+#                                                         if verify_hour or temporary_table_six == []:
+#                                                             check_table = tables.objects.filter(restaurant__restaurant_name__contains=restaurant_name,table_number__contains=can_connect_list_five[ccl_six])
+#                                                             save_necessary_people_six = save_necessary_people_five
+#                                                             save_necessary_people_six -= int(check_table[0].number_of_seats) + connect_logic[2].number_of_chairs
+#                                                             used_table_list_five = used_table_list_four
+#                                                             used_table_list_five.append(can_connect_list_five[ccl_six])
+#                                                             if save_necessary_people_six <= 0:
+#                                                                 print(ii)
+#                                                                 print(the_hours)
+#                                                                 availabletimes.append(the_hours[ii])
+#                                                                 the_hours.remove(the_hours[ii])
+#                                                                 ii -= 1
+#                                                                 break
+#                                                             can_connect_list_six = check_table[0].can_connect_tables[:]
+#                                                             can_connect_list_six = can_connect_list_six.split(',')
+#                                                             for utl in range(0, len(used_table_list_five), 1):
+#                                                                 for ccll in can_connect_list_six:
+#                                                                     if ccll == used_table_list_five[utl]:
+#                                                                         can_connect_list_six.remove(used_table_list_five[utl])
+
+
+    # return availabletimes
 
 
 def retrieveTablesUsed(date, shift, restaurantname):
@@ -521,6 +671,8 @@ def reservationss(request, username, restaurantname):
             zone = time[13:]
             assign_tables = assignThTables(tu, int(number_of_people), estimated_time, restaurantname, list_hours, zone)
             table_list = ''
+            print('assign_tables')
+            print(assign_tables)
             for ii in assign_tables:
                 table_list += ii + ','
             table_list = table_list[:-1]

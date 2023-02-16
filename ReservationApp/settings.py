@@ -47,8 +47,9 @@ INSTALLED_APPS = [
     'captcha',
     'restaurants',
     'reservations',
-    "phonenumber_field",
-    "phonenumbers",
+    'phonenumber_field',
+    'phonenumbers',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
