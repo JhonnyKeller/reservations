@@ -1,0 +1,31 @@
+<body style="background-color: #d3d3d3;">
+    <style>
+      @import url('https://fonts.googleapis.com/css/css?family=Roboto');
+    </style> <br><br>
+    <center>
+      <div style="background-color:#fff; width: 70%; height: auto; padding-bottom:15px; border-radius: 5px; margin-top: 50px; margin-bottom: 50px; font-family: roboto;">
+        <br><br>
+        <h2>SitSmarter</h2>
+        <h3>{{restaurant}}</h3>
+      <p style="font-size: 15px;">A sua reserva foi confirmada pelo restaurante!</p> <p style="font-size: 15px;"></p>
+      <hr style="color:#0d6efd; width: 80%;">
+  
+      <div style="width:80%; height:auto; text-align:start; line-height:30%;">
+      <p style="font-size: 25px;">Informação de reserva:</p>
+      <p style="font-size: 16px;">Nome: {{name}}</p> <br>
+      <p style="font-size: 16px;">Numero de telemóvel: {{phone_number}}</p> <br>
+      <p style="font-size: 16px;">Dia: {{day}}</p> <br>
+      <p style="font-size: 16px;">Hora: {{time}}</p> <br>
+      </div>
+      <br><br>
+      <p style="font-size: 25px;">Clique no botão abaixo, onde pode alterar ou cancelar a sua reserva.</p><br><br>
+
+      <a type="button"
+      href="{{link_to_reservation_menu}}"
+      style="color:#fff; background-color:#0d6efd; padding:10px; text-decoration: none; border: none; border-radius:4px; font-size:22px;">
+      Aceder Reserva
+      </a>
+      <br><br>
+  </div>
+  </center>
+  </body>

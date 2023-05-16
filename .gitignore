@@ -1,6 +1,4 @@
 __pycache__/
 migrations/
-reservationsEnv/
 db.sqlite3
 .env
-media/

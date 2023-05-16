@@ -1,0 +1,23 @@
+<body style="background-color: #d3d3d3;">
+    <style>
+      @import url('https://fonts.googleapis.com/css/css?family=Roboto');
+    </style> <br><br>
+    <center>
+      <div style="background-color:#fff; width: 70%; height: auto; padding-bottom:15px; border-radius: 5px; margin-top: 50px; margin-bottom: 50px; font-family: roboto;">
+        <br><br>
+        <h2>SitSmarter</h2>
+        <h3>{{restaurant}}</h3>
+      <p style="font-size: 15px;">Pedimos imensa desculpa mas por problemas internos tivemos de cancelar a seguinte reserva:</p> <p style="font-size: 15px;"></p>
+      <hr style="color:#0d6efd; width: 80%;">
+  
+      <div style="width:80%; height:auto; text-align:start; line-height:30%;">
+      <p style="font-size: 25px;">Informação de reserva:</p>
+      <p style="font-size: 16px;">Nome: {{name}}</p> <br>
+      <p style="font-size: 16px;">Numero de telemóvel: {{phone_number}}</p> <br>
+      <p style="font-size: 16px;">Dia: {{day}}</p> <br>
+      <p style="font-size: 16px;">Hora: {{time}}</p> <br>
+      </div>
+      <br><br>
+  </div>
+  </center>
+  </body>
